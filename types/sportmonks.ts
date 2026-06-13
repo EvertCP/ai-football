@@ -58,6 +58,11 @@ export interface Fixture {
   venue?: Venue;
   events?: MatchEvent[];
   predictions?: SportmonksPrediction[];
+  // Internal fields added by our API routes
+  _leagueId?: number;
+  _leagueName?: string;
+  _leagueImage?: string;
+  group?: { name: string };
   // TODO: Add more includes as needed:
   // - odds: for betting market data
   // - lineups: for team lineups

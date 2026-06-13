@@ -127,7 +127,8 @@ export async function getFixtureById(
         'predictions.type',
       ],
     });
-  } catch (_error) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
     // If it fails (likely due to predictions.type not being in plan),
     // retry without premium includes
     console.warn('[Sportmonks] Retrying without predictions include');

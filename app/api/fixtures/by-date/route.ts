@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Fixture } from '@/types/sportmonks';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch fixtures for all needed UTC dates
-    const allLeagues: Record<number, { id: number; name: string; image_path: string; today: any[] }> = {};
+    const allLeagues: Record<number, { id: number; name: string; image_path: string; today: Fixture[] }> = {};
 
     for (const d of dates) {
       const url = new URL(`${SPORTMONKS_BASE_URL}/leagues/date/${d}`);

@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { SportmonksResponse } from '@/types/sportmonks';
+import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +9,7 @@ const SPORTMONKS_BASE_URL = process.env.SPORTMONKS_BASE_URL || 'https://api.spor
  * GET /api/leagues
  * Returns all leagues available in the current subscription
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const url = new URL(`${SPORTMONKS_BASE_URL}/leagues`);
     url.searchParams.set('api_token', SPORTMONKS_API_TOKEN || '');

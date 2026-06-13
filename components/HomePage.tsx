@@ -74,7 +74,7 @@ export default function HomePage() {
   // Filter by league
   const filteredByLeague = useMemo(() => {
     if (selectedLeague === 'all') return filteredByStatus;
-    return filteredByStatus.filter(f => (f as any)._leagueId === parseInt(selectedLeague));
+    return filteredByStatus.filter(f => f._leagueId === parseInt(selectedLeague));
   }, [filteredByStatus, selectedLeague]);
 
   // Filter by search
@@ -93,14 +93,14 @@ export default function HomePage() {
     const groups: Record<string, { id: number; name: string; image: string; fixtures: Fixture[]; group?: string }[]> = {};
     
     filteredFixtures.forEach(f => {
-      const lid = (f as any)._leagueId;
-      const lname = (f as any)._leagueName;
-      const limage = (f as any)._leagueImage;
+      const lid = f._leagueId || 0;
+      const lname = f._leagueName || '';
+      const limage = f._leagueImage || '';
       const key = `${lid}`;
       if (!groups[key]) groups[key] = [];
       
       // Check if fixture has a group (from round/stage)
-      const groupName = (f as any).group?.name || '';
+      const groupName = f.group?.name || '';
       let section = groups[key].find(s => s.group === groupName);
       if (!section) {
         section = { id: lid, name: lname, image: limage, fixtures: [], group: groupName };
