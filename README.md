@@ -10,37 +10,6 @@ MVP de una plataforma web de análisis deportivo para fútbol que consume la API
 - **API Routes** internas (token seguro en servidor)
 - **Sportmonks Football API 3.0** como fuente de datos
 
-## Configuración
-
-### 1. Variables de entorno
-
-Copia `.env.example` a `.env.local` y configura tu token:
-
-```bash
-cp .env.example .env.local
-```
-
-Edita `.env.local`:
-```
-SPORTMONKS_API_TOKEN=tu_token_aqui
-SPORTMONKS_BASE_URL=https://api.sportmonks.com/v3/football
-```
-
-Obtén tu token en [sportmonks.com](https://www.sportmonks.com/).
-
-### 2. Instalar dependencias
-
-```bash
-npm install
-```
-
-### 3. Iniciar servidor de desarrollo
-
-```bash
-npm run dev
-```
-
-Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
 ## Estructura del Proyecto
 
