@@ -127,7 +127,7 @@ export async function getFixtureById(
         'predictions.type',
       ],
     });
-  } catch (error) {
+  } catch (_error) {
     // If it fails (likely due to predictions.type not being in plan),
     // retry without premium includes
     console.warn('[Sportmonks] Retrying without predictions include');

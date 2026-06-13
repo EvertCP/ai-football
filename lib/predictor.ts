@@ -396,7 +396,7 @@ function analyzeGoalTrends(homeForm: TeamForm, awayForm: TeamForm) {
  */
 function analyzeStatistics(fixture: Fixture) {
   let homeAdjust = 0;
-  let drawAdjust = 0;
+  const drawAdjust = 0;
   let awayAdjust = 0;
 
   if (!fixture.statistics) return { homeAdjust, drawAdjust, awayAdjust };
