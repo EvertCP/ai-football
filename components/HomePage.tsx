@@ -24,23 +24,52 @@ export default function HomePage() {
   const [featured, setFeatured] = useState<Fixture[]>([]);
 
   // Fetch fixtures for selected date
-  useEffect(() => {
-    async function fetchByDate() {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const tzOffset = -(new Date().getTimezoneOffset() / 60);
-        const res = await fetch(`/api/fixtures/by-date?date=${date}&tz=${tzOffset}`);
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Error');
-        setLeagues(data.data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error');
-      } finally {
-        setIsLoading(false);
-      }
+  const fetchByDate = async (showLoading = true) => {
+    if (showLoading) setIsLoading(true);
+    setError(null);
+    try {
+      const tzOffset = -(new Date().getTimezoneOffset() / 60);
+      const res = await fetch(`/api/fixtures/by-date?date=${date}&tz=${tzOffset}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error');
+      setLeagues(data.data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error');
+    } finally {
+      if (showLoading) setIsLoading(false);
     }
-    fetchByDate();
+  };
+
+  useEffect(() => {
+    fetchByDate(true);
+  }, [date]);
+
+  // Auto-refresh every 60s when there are live matches
+  useEffect(() => {
+    const hasLive = leagues.some(l =>
+      l.today.some(f => {
+        const dev = f.state?.developer_name || '';
+        return ['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK', 'EXTRA_TIME_BREAK', 'PEN_BREAK'].includes(dev);
+      })
+    );
+    if (!hasLive) return;
+
+    const interval = setInterval(() => {
+      fetchByDate(false);
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [leagues, date]);
+
+  // Refresh data when user returns to the tab (e.g., after viewing a match detail)
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchByDate(false);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [date]);
 
   // Fetch featured/recommended matches
@@ -64,8 +93,8 @@ export default function HomePage() {
   const filteredByStatus = useMemo(() => {
     return allFixtures.filter(f => {
       const dev = f.state?.developer_name || 'NS';
-      if (statusFilter === 'live') return ['1H', '2H', 'HT', 'ET', 'PEN', 'LIVE', 'BREAK'].includes(dev);
-      if (statusFilter === 'finished') return dev === 'FT' || dev === 'AET';
+      if (statusFilter === 'live') return ['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK', 'EXTRA_TIME_BREAK', 'PEN_BREAK'].includes(dev);
+      if (statusFilter === 'finished') return dev === 'FT' || dev === 'AET' || dev === 'FT_PEN';
       if (statusFilter === 'upcoming') return dev === 'NS' || !dev;
       return true;
     });
@@ -115,7 +144,7 @@ export default function HomePage() {
   // Counts
   const liveCount = allFixtures.filter(f => {
     const dev = f.state?.developer_name || '';
-    return ['1H', '2H', 'HT', 'ET', 'PEN', 'LIVE', 'BREAK'].includes(dev);
+    return ['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK', 'EXTRA_TIME_BREAK', 'PEN_BREAK'].includes(dev);
   }).length;
 
   return (

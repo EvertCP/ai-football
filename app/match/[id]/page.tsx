@@ -57,32 +57,46 @@ export default function MatchDetailPage() {
   const [predictionError, setPredictionError] = useState<string | null>(null);
 
   // Fetch fixture details
-  useEffect(() => {
-    async function fetchFixture() {
-      setIsLoadingFixture(true);
-      setFixtureError(null);
+  const fetchFixture = async (showLoading = true) => {
+    if (showLoading) setIsLoadingFixture(true);
+    setFixtureError(null);
 
-      try {
-        const response = await fetch(`/api/fixtures/${fixtureId}`);
-        const data = await response.json();
+    try {
+      const response = await fetch(`/api/fixtures/${fixtureId}`);
+      const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.error || 'Error al obtener el partido');
-        }
-
-        setFixture(data.data);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Error desconocido';
-        setFixtureError(message);
-      } finally {
-        setIsLoadingFixture(false);
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al obtener el partido');
       }
-    }
 
+      setFixture(data.data);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error desconocido';
+      setFixtureError(message);
+    } finally {
+      if (showLoading) setIsLoadingFixture(false);
+    }
+  };
+
+  useEffect(() => {
     if (fixtureId) {
-      fetchFixture();
+      fetchFixture(true);
     }
   }, [fixtureId]);
+
+  // Auto-refresh every 30s for live matches (scores + statistics)
+  useEffect(() => {
+    if (!fixture) return;
+    const dev = fixture.state?.developer_name || '';
+    const isLive = ['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK', 'EXTRA_TIME_BREAK', 'PEN_BREAK'].includes(dev);
+    if (!isLive) return;
+
+    const interval = setInterval(() => {
+      fetchFixture(false);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [fixture?.state?.developer_name, fixtureId]);
 
   // Fetch prediction + form data
   useEffect(() => {
@@ -201,9 +215,9 @@ export default function MatchDetailPage() {
   const getStatusInfo = () => {
     const devName = state?.developer_name;
     if (!devName || devName === 'NS') return { text: 'Por jugar', color: 'bg-blue-100 text-blue-800' };
-    if (devName === 'FT' || devName === 'AET') return { text: 'Finalizado', color: 'bg-gray-100 text-gray-800' };
-    if (['1H', '2H', 'HT', 'ET', 'PEN', 'LIVE', 'BREAK'].includes(devName)) return { text: 'En vivo', color: 'bg-green-100 text-green-800' };
-    if (['CANC', 'PST', 'SUSP', 'ABAN'].includes(devName)) return { text: 'Suspendido', color: 'bg-red-100 text-red-800' };
+    if (devName === 'FT' || devName === 'AET' || devName === 'FT_PEN') return { text: 'Finalizado', color: 'bg-gray-100 text-gray-800' };
+    if (['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK', 'EXTRA_TIME_BREAK', 'PEN_BREAK'].includes(devName)) return { text: 'En vivo', color: 'bg-green-100 text-green-800' };
+    if (['CANCELLED', 'POSTPONED', 'SUSPENDED', 'ABANDONED', 'INTERRUPTED', 'DELAYED'].includes(devName)) return { text: 'Suspendido', color: 'bg-red-100 text-red-800' };
     return { text: state?.name || devName, color: 'bg-gray-100 text-gray-600' };
   };
 
@@ -213,9 +227,9 @@ export default function MatchDetailPage() {
   const stateDevName = state?.developer_name;
   const matchState: 'pre' | 'live' | 'finished' = (() => {
     if (!stateDevName || stateDevName === 'NS') return 'pre';
-    if (stateDevName === 'FT' || stateDevName === 'AET') return 'finished';
-    if (['1H', '2H', 'HT', 'ET', 'PEN', 'LIVE', 'BREAK'].includes(stateDevName)) return 'live';
-    if (['CANC', 'PST', 'SUSP', 'ABAN'].includes(stateDevName)) return 'pre';
+    if (stateDevName === 'FT' || stateDevName === 'AET' || stateDevName === 'FT_PEN') return 'finished';
+    if (['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK', 'EXTRA_TIME_BREAK', 'PEN_BREAK'].includes(stateDevName)) return 'live';
+    if (['CANCELLED', 'POSTPONED', 'SUSPENDED', 'ABANDONED', 'INTERRUPTED', 'DELAYED'].includes(stateDevName)) return 'pre';
     return 'pre';
   })();
 

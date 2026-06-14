@@ -40,9 +40,9 @@ export default function MatchRow({ fixture }: MatchRowProps) {
 
   // Status
   const devName = state?.developer_name;
-  const isLive = ['1H', '2H', 'HT', 'ET', 'PEN', 'LIVE', 'BREAK'].includes(devName || '');
-  const isFinished = devName === 'FT' || devName === 'AET';
-  const isPostponed = ['CANC', 'PST', 'SUSP', 'ABAN'].includes(devName || '');
+  const isLive = ['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK', 'EXTRA_TIME_BREAK', 'PEN_BREAK'].includes(devName || '');
+  const isFinished = devName === 'FT' || devName === 'AET' || devName === 'FT_PEN';
+  const isPostponed = ['CANCELLED', 'POSTPONED', 'SUSPENDED', 'ABANDONED', 'INTERRUPTED', 'DELAYED'].includes(devName || '');
 
   const statusLabel = isFinished ? 'FT' : isLive ? 'EN VIVO' : isPostponed ? 'SUSP' : formattedTime;
 

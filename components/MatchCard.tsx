@@ -58,13 +58,13 @@ export default function MatchCard({ fixture }: MatchCardProps) {
     if (!devName || devName === 'NS') {
       return { text: 'Por jugar', color: 'bg-blue-100 text-blue-800' };
     }
-    if (devName === 'FT' || devName === 'AET') {
+    if (devName === 'FT' || devName === 'AET' || devName === 'FT_PEN') {
       return { text: 'Finalizado', color: 'bg-gray-100 text-gray-800' };
     }
-    if (['1H', '2H', 'HT', 'ET', 'PEN', 'LIVE', 'BREAK'].includes(devName)) {
+    if (['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK', 'EXTRA_TIME_BREAK', 'PEN_BREAK'].includes(devName)) {
       return { text: 'En vivo', color: 'bg-green-100 text-green-800' };
     }
-    if (['CANC', 'PST', 'SUSP', 'ABAN'].includes(devName)) {
+    if (['CANCELLED', 'POSTPONED', 'SUSPENDED', 'ABANDONED', 'INTERRUPTED', 'DELAYED'].includes(devName)) {
       return { text: 'Suspendido', color: 'bg-red-100 text-red-800' };
     }
     return { text: state?.name || 'Desconocido', color: 'bg-gray-100 text-gray-600' };

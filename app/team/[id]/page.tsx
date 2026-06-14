@@ -515,7 +515,7 @@ function FixtureRow({ fixture, teamId, showResult }: { fixture: Fixture; teamId:
         <div className="flex-shrink-0">
           <span className={`text-xs px-2 py-1 rounded ${
             fixture.state?.developer_name === 'NS' ? 'bg-gray-100 text-gray-600' :
-            fixture.state?.developer_name === 'LIVE' || fixture.state?.developer_name === '1H' || fixture.state?.developer_name === '2H'
+            ['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK'].includes(fixture.state?.developer_name || '')
               ? 'bg-green-100 text-green-700' :
             'bg-gray-100 text-gray-500'
           }`}>

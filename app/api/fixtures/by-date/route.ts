@@ -49,10 +49,11 @@ export async function GET(request: NextRequest) {
     for (const d of dates) {
       const url = new URL(`${SPORTMONKS_BASE_URL}/leagues/date/${d}`);
       url.searchParams.set('api_token', SPORTMONKS_API_TOKEN || '');
-      url.searchParams.set('include', 'today.scores;today.participants;today.stage;today.group;today.round');
+      url.searchParams.set('include', 'today.scores;today.participants;today.state;today.stage;today.group;today.round');
 
       const response = await fetch(url.toString(), {
         headers: { Accept: 'application/json' },
+        cache: 'no-store',
       });
 
       if (response.ok) {

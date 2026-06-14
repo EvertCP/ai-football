@@ -141,23 +141,30 @@ export interface FixtureState {
 
 export type FixtureStatus =
   | 'NS' // Not Started
-  | '1H' // First Half
+  | 'INPLAY_1ST_HALF' // 1st Half
   | 'HT' // Half Time
-  | '2H' // Second Half
-  | 'ET' // Extra Time
-  | 'PEN' // Penalties
+  | 'INPLAY_2ND_HALF' // 2nd Half
+  | 'INPLAY_ET' // Extra Time
+  | 'INPLAY_ET_2ND_HALF' // Extra Time 2nd Half
+  | 'EXTRA_TIME_BREAK' // Extra Time Break
+  | 'INPLAY_PENALTIES' // Penalties
+  | 'PEN_BREAK' // Penalties Break
   | 'FT' // Full Time
   | 'AET' // After Extra Time
+  | 'FT_PEN' // After Penalties
   | 'BREAK' // Break
-  | 'SUSP' // Suspended
-  | 'INT' // Interrupted
-  | 'ABAN' // Abandoned
-  | 'CANC' // Cancelled
-  | 'PST' // Postponed
+  | 'SUSPENDED' // Suspended
+  | 'INTERRUPTED' // Interrupted
+  | 'ABANDONED' // Abandoned
+  | 'CANCELLED' // Cancelled
+  | 'POSTPONED' // Postponed
   | 'TBA' // To Be Announced
   | 'WO' // Walkover
-  | 'AU' // Awaiting Updates
-  | 'LIVE'; // Live
+  | 'AWAITING_UPDATES' // Awaiting Updates
+  | 'DELAYED' // Delayed
+  | 'DELETED' // Deleted
+  | 'PENDING' // Pending
+  | 'AWARDED'; // Awarded
 
 export interface Venue {
   id: number;

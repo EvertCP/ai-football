@@ -72,8 +72,7 @@ async function sportmonksFetch<T>(
     headers: {
       'Accept': 'application/json',
     },
-    // Cache for 5 minutes in production
-    next: { revalidate: 300 },
+    cache: 'no-store',
   });
 
   if (!response.ok) {
