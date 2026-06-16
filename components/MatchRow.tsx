@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Fixture } from '@/types/sportmonks';
+import { formatMatchTime } from '@/lib/formatDate';
 
 interface MatchRowProps {
   fixture: Fixture;
@@ -15,13 +16,8 @@ export default function MatchRow({ fixture }: MatchRowProps) {
   const awayTeam = fixture.participants?.find(p => p.meta?.location === 'away');
   const state = fixture.state;
 
-  // Format time (API returns UTC)
-  const utcDate = fixture.starting_at?.replace(' ', 'T') + 'Z';
-  const matchDate = new Date(utcDate);
-  const formattedTime = matchDate.toLocaleTimeString('es-MX', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  // Format time (API returns UTC, converted to user's local timezone)
+  const formattedTime = formatMatchTime(fixture.starting_at);
 
   // Get score
   let homeGoals: number | null = null;

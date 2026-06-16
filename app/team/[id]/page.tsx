@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Fixture } from '@/types/sportmonks';
+import { formatMatchTime, formatMatchDate } from '@/lib/formatDate';
 
 interface Player {
   id: number;
@@ -444,11 +445,9 @@ function FixtureRow({ fixture, teamId, showResult }: { fixture: Fixture; teamId:
   const awayTeam = fixture.participants?.find(p => p.meta?.location === 'away');
   const isHome = homeTeam?.id === teamId;
 
-  // Date formatting
-  const utc = fixture.starting_at?.replace(' ', 'T') + 'Z';
-  const dateObj = new Date(utc);
-  const dateStr = dateObj.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
-  const timeStr = dateObj.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+  // Date formatting (API returns UTC, converted to user's local timezone)
+  const dateStr = formatMatchDate(fixture.starting_at, { day: 'numeric', month: 'short' });
+  const timeStr = formatMatchTime(fixture.starting_at);
 
   // Score
   let homeGoals = '-';

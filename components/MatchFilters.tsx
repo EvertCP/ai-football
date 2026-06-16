@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getLocalDateString } from '@/lib/formatDate';
 
 interface MatchFiltersProps {
   onDateChange: (date: string) => void;
@@ -31,7 +32,7 @@ export default function MatchFilters({ onDateChange, currentDate, isLoading }: M
   const getRelativeDate = (daysOffset: number): string => {
     const date = new Date();
     date.setDate(date.getDate() + daysOffset);
-    return date.toISOString().split('T')[0];
+    return getLocalDateString(date);
   };
 
   const quickDates = [

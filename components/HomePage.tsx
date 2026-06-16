@@ -5,6 +5,7 @@ import Link from 'next/link';
 import MatchRow from '@/components/MatchRow';
 import DateCalendar from '@/components/DateCalendar';
 import { Fixture } from '@/types/sportmonks';
+import { formatMatchTime, formatMatchDate, parseUTCDate, getLocalDateString } from '@/lib/formatDate';
 
 interface LeagueWithFixtures {
   id: number;
@@ -14,7 +15,7 @@ interface LeagueWithFixtures {
 }
 
 export default function HomePage() {
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(getLocalDateString());
   const [leagues, setLeagues] = useState<LeagueWithFixtures[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -305,21 +306,17 @@ export default function HomePage() {
               </div>
               <div className="px-3 text-center">
                 <p className="text-lg font-bold">
-                  {(() => {
-                    const utc = featured[0].starting_at?.replace(' ', 'T') + 'Z';
-                    return new Date(utc).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-                  })()}
+                  {formatMatchTime(featured[0].starting_at)}
                 </p>
                 <p className="text-[10px] opacity-70">
                   {(() => {
-                    const utc = featured[0].starting_at?.replace(' ', 'T') + 'Z';
-                    const d = new Date(utc);
+                    const d = parseUTCDate(featured[0].starting_at);
                     const today = new Date();
                     if (d.toDateString() === today.toDateString()) return 'Hoy';
                     const tomorrow = new Date(today);
                     tomorrow.setDate(tomorrow.getDate() + 1);
                     if (d.toDateString() === tomorrow.toDateString()) return 'Mañana';
-                    return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
+                    return formatMatchDate(featured[0].starting_at, { day: 'numeric', month: 'short' });
                   })()}
                 </p>
               </div>

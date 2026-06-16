@@ -6,6 +6,7 @@ import Link from 'next/link';
 import MatchCard from '@/components/MatchCard';
 import DateCalendar from '@/components/DateCalendar';
 import { Fixture } from '@/types/sportmonks';
+import { parseUTCDate, getLocalDateString } from '@/lib/formatDate';
 
 interface CalendarLeague {
   id: number;
@@ -64,7 +65,7 @@ export default function CompetitionPage() {
   const [activeTab, setActiveTab] = useState<'calendar' | 'fixtures' | 'standings'>('calendar');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
-  const [calendarDate, setCalendarDate] = useState(new Date().toISOString().split('T')[0]);
+  const [calendarDate, setCalendarDate] = useState(getLocalDateString());
   const [calendarFixtures, setCalendarFixtures] = useState<Fixture[]>([]);
   const [isLoadingCalendar, setIsLoadingCalendar] = useState(false);
   const [calendarError, setCalendarError] = useState<string | null>(null);
@@ -296,12 +297,11 @@ export default function CompetitionPage() {
               <p className="text-sm text-gray-500">{fixtures.length} partidos cargados</p>
               {/* Group fixtures by LOCAL date, today first */}
               {(() => {
-                const today = new Date().toISOString().split('T')[0];
+                const today = getLocalDateString();
                 const grouped: Record<string, Fixture[]> = {};
                 fixtures.forEach(f => {
                   // Convert UTC to local date for grouping
-                  const utc = f.starting_at?.replace(' ', 'T') + 'Z';
-                  const localDate = new Date(utc).toLocaleDateString('en-CA'); // YYYY-MM-DD format
+                  const localDate = parseUTCDate(f.starting_at).toLocaleDateString('en-CA'); // YYYY-MM-DD format
                   if (!grouped[localDate]) grouped[localDate] = [];
                   grouped[localDate].push(f);
                 });
@@ -312,7 +312,7 @@ export default function CompetitionPage() {
                   return a.localeCompare(b);
                 });
                 return sortedDates.map(date => {
-                  const dateObj = new Date(date + 'T12:00:00');
+                  const dateObj = new Date(date + 'T12:00:00Z');
                   const isToday = date === today;
                   const label = isToday ? 'Hoy' : dateObj.toLocaleDateString('es-MX', {
                     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'

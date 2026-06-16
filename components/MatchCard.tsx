@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Fixture } from '@/types/sportmonks';
+import { formatMatchTime, formatMatchDate } from '@/lib/formatDate';
 
 interface MatchCardProps {
   fixture: Fixture;
@@ -24,18 +25,9 @@ export default function MatchCard({ fixture }: MatchCardProps) {
   const league = fixture.league;
   const state = fixture.state;
 
-  // Format date (API returns UTC, append 'Z' so JS converts to local timezone)
-  const utcDate = fixture.starting_at?.replace(' ', 'T') + 'Z';
-  const matchDate = new Date(utcDate);
-  const formattedDate = matchDate.toLocaleDateString('es-MX', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-  const formattedTime = matchDate.toLocaleTimeString('es-MX', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  // Format date/time (API returns UTC, converted to user's local timezone)
+  const formattedDate = formatMatchDate(fixture.starting_at);
+  const formattedTime = formatMatchTime(fixture.starting_at);
 
   // Get current score if available
   let homeGoals: number | null = null;

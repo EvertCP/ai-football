@@ -71,16 +71,17 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter fixtures to only those that match the user's LOCAL date
-    const localDateStart = new Date(date + 'T00:00:00');
-    localDateStart.setHours(localDateStart.getHours() - tzOffset); // Convert to UTC
-    const localDateEnd = new Date(date + 'T23:59:59');
-    localDateEnd.setHours(localDateEnd.getHours() - tzOffset); // Convert to UTC
+    // User's local midnight in UTC: e.g., for UTC-6, June 14 00:00 local = June 14 06:00 UTC
+    const startUTC = new Date(date + 'T00:00:00Z');
+    startUTC.setUTCHours(startUTC.getUTCHours() - tzOffset);
+    const endUTC = new Date(date + 'T23:59:59Z');
+    endUTC.setUTCHours(endUTC.getUTCHours() - tzOffset);
 
     const filteredLeagues = Object.values(allLeagues).map(league => ({
       ...league,
       today: league.today.filter(fixture => {
         const fixtureTime = new Date(fixture.starting_at?.replace(' ', 'T') + 'Z');
-        return fixtureTime >= localDateStart && fixtureTime <= localDateEnd;
+        return fixtureTime >= startUTC && fixtureTime <= endUTC;
       }),
     })).filter(league => league.today.length > 0);
 

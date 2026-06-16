@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
+import { getLocalDateString } from '@/lib/formatDate';
 
 interface DateCalendarProps {
   selectedDate: string; // YYYY-MM-DD
@@ -12,16 +13,31 @@ interface DateCalendarProps {
  * Shows 9 days centered around the selected date with navigation arrows.
  */
 export default function DateCalendar({ selectedDate, onDateChange }: DateCalendarProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to center the selected day on mount and when selection changes
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const selectedEl = container.querySelector('[data-selected="true"]') as HTMLElement;
+    if (selectedEl) {
+      const containerWidth = container.offsetWidth;
+      const elLeft = selectedEl.offsetLeft;
+      const elWidth = selectedEl.offsetWidth;
+      container.scrollLeft = elLeft - (containerWidth / 2) + (elWidth / 2);
+    }
+  }, [selectedDate]);
+
   const days = useMemo(() => {
     const center = new Date(selectedDate + 'T12:00:00');
     const result: { date: string; label: string; dayName: string; isToday: boolean }[] = [];
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateString();
 
     for (let i = -4; i <= 4; i++) {
       const d = new Date(center);
       d.setDate(d.getDate() + i);
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = getLocalDateString(d);
       const dayName = d.toLocaleDateString('es-MX', { weekday: 'short' });
       const label = d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
       result.push({
@@ -37,17 +53,17 @@ export default function DateCalendar({ selectedDate, onDateChange }: DateCalenda
   const goBack = () => {
     const d = new Date(selectedDate + 'T12:00:00');
     d.setDate(d.getDate() - 5);
-    onDateChange(d.toISOString().split('T')[0]);
+    onDateChange(getLocalDateString(d));
   };
 
   const goForward = () => {
     const d = new Date(selectedDate + 'T12:00:00');
     d.setDate(d.getDate() + 5);
-    onDateChange(d.toISOString().split('T')[0]);
+    onDateChange(getLocalDateString(d));
   };
 
   const goToToday = () => {
-    onDateChange(new Date().toISOString().split('T')[0]);
+    onDateChange(getLocalDateString());
   };
 
   return (
@@ -73,14 +89,15 @@ export default function DateCalendar({ selectedDate, onDateChange }: DateCalenda
         </button>
 
         {/* Days */}
-        <div className="flex-1 flex items-center justify-between gap-1 overflow-hidden">
+        <div ref={scrollRef} className="flex-1 flex items-center gap-1 overflow-x-auto scrollbar-hide scroll-smooth">
           {days.map((day) => {
             const isSelected = day.date === selectedDate;
             return (
               <button
                 key={day.date}
+                data-selected={isSelected}
                 onClick={() => onDateChange(day.date)}
-                className={`flex flex-col items-center px-2 py-1.5 rounded-lg transition-all min-w-[60px] ${
+                className={`flex flex-col items-center px-2 py-1.5 rounded-lg transition-all min-w-[60px] flex-shrink-0 ${
                   isSelected
                     ? 'bg-indigo-600 text-white shadow-sm'
                     : day.isToday
