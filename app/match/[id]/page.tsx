@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import PredictionPanel from '@/components/PredictionPanel';
 import StatsTable from '@/components/StatsTable';
+import MatchLineups from '@/components/MatchLineups';
 import { Fixture, Prediction } from '@/types/sportmonks';
 import { formatMatchTime, formatMatchDateFull } from '@/lib/formatDate';
 
@@ -52,6 +53,7 @@ export default function MatchDetailPage() {
   const [homeForm, setHomeForm] = useState<FormData | null>(null);
   const [awayForm, setAwayForm] = useState<FormData | null>(null);
   const [h2h, setH2H] = useState<H2HData | null>(null);
+  const [activeTab, setActiveTab] = useState<'stats' | 'lineups' | 'prediction'>('stats');
   const [isLoadingFixture, setIsLoadingFixture] = useState(true);
   const [isLoadingPrediction, setIsLoadingPrediction] = useState(false);
   const [fixtureError, setFixtureError] = useState<string | null>(null);
@@ -300,14 +302,59 @@ export default function MatchDetailPage() {
         </div>
       </div>
 
-      {/* Content Grid: Left Panel + Prediction */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Panel: Context-aware based on match state */}
+      {/* Tab Navigation */}
+      <div className="bg-white rounded-xl border border-gray-200 p-1.5 flex gap-1">
+        <button
+          onClick={() => setActiveTab('stats')}
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            activeTab === 'stats'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span className="hidden sm:inline">Estadísticas</span>
+          <span className="sm:hidden">Stats</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('lineups')}
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            activeTab === 'lineups'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span className="hidden sm:inline">Alineación</span>
+          <span className="sm:hidden">XI</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('prediction')}
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            activeTab === 'prediction'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          <span className="hidden sm:inline">Predicción</span>
+          <span className="sm:hidden">Pred.</span>
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      {/* --- ESTADÍSTICAS --- */}
+      {activeTab === 'stats' && (
         <div className="space-y-6">
           {/* Pre-match: Show form, H2H, and xG data */}
           {matchState === 'pre' && (
             <>
-              {/* Team Form Cards */}
               {isLoadingPrediction ? (
                 <div className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
                   <div className="h-5 bg-gray-200 rounded w-40 mb-4" />
@@ -328,7 +375,6 @@ export default function MatchDetailPage() {
                         xG Estimado Pre-Partido
                       </h3>
                       <div className="grid grid-cols-2 gap-4">
-                        {/* Home xG */}
                         <div className="text-center p-4 bg-indigo-50 rounded-lg">
                           <p className="text-xs font-medium text-indigo-600 mb-1">{homeTeam?.name}</p>
                           <p className="text-3xl font-bold text-indigo-700">{homeForm?.estimatedXG?.xgFor.toFixed(2) || '—'}</p>
@@ -336,7 +382,6 @@ export default function MatchDetailPage() {
                           <p className="text-lg font-semibold text-indigo-400 mt-2">{homeForm?.estimatedXG?.xgAgainst.toFixed(2) || '—'}</p>
                           <p className="text-xs text-indigo-400">xG en contra / partido</p>
                         </div>
-                        {/* Away xG */}
                         <div className="text-center p-4 bg-rose-50 rounded-lg">
                           <p className="text-xs font-medium text-rose-600 mb-1">{awayTeam?.name}</p>
                           <p className="text-3xl font-bold text-rose-700">{awayForm?.estimatedXG?.xgFor.toFixed(2) || '—'}</p>
@@ -432,7 +477,6 @@ export default function MatchDetailPage() {
                       <p className="text-xs text-gray-400 mt-3 text-center">
                         {h2h.totalMatches} partidos entre ambos equipos
                       </p>
-                      {/* H2H Visual bar */}
                       <div className="flex h-2 rounded-full overflow-hidden mt-3">
                         <div className="bg-indigo-500" style={{ width: `${(h2h.team1Wins / h2h.totalMatches) * 100}%` }} />
                         <div className="bg-gray-300" style={{ width: `${(h2h.draws / h2h.totalMatches) * 100}%` }} />
@@ -478,8 +522,21 @@ export default function MatchDetailPage() {
             </>
           )}
         </div>
+      )}
 
-        {/* Prediction */}
+      {/* --- ALINEACIÓN --- */}
+      {activeTab === 'lineups' && (
+        <MatchLineups
+          lineups={fixture.lineups || []}
+          formations={fixture.formations}
+          metadata={fixture.metadata}
+          homeTeam={homeTeam}
+          awayTeam={awayTeam}
+        />
+      )}
+
+      {/* --- PREDICCIÓN --- */}
+      {activeTab === 'prediction' && (
         <PredictionPanel
           prediction={prediction}
           isLoading={isLoadingPrediction}
@@ -487,7 +544,7 @@ export default function MatchDetailPage() {
           homeTeamName={homeTeam?.name || 'Local'}
           awayTeamName={awayTeam?.name || 'Visitante'}
         />
-      </div>
+      )}
     </div>
   );
 }

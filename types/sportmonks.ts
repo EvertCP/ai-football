@@ -57,6 +57,9 @@ export interface Fixture {
   state?: FixtureState;
   venue?: Venue;
   events?: MatchEvent[];
+  lineups?: LineupPlayer[];
+  formations?: Formation[];
+  metadata?: FixtureMetadata[];
   predictions?: SportmonksPrediction[];
   // Internal fields added by our API routes
   _leagueId?: number;
@@ -198,6 +201,58 @@ export interface SportmonksPrediction {
     id: number;
     name: string;
     code: string;
+    developer_name: string;
+  };
+}
+
+// Lineup player from fixture lineups include
+export interface LineupPlayer {
+  id: number;
+  sport_id: number;
+  fixture_id: number;
+  player_id: number;
+  team_id: number;
+  formation_field: string | null; // e.g., "1:1", "2:3" — null for bench
+  type_id: number; // 11 = starting XI, 12 = bench
+  position: string; // "G", "D", "M", "A"
+  detail_type_id: number | null;
+  player_name: string;
+  jersey_number: number;
+  player?: {
+    id: number;
+    sport_id: number;
+    country_id: number;
+    nationality_id: number;
+    name: string;
+    common_name: string;
+    display_name: string;
+    firstname: string;
+    lastname: string;
+    image_path: string;
+    position_id: number;
+    detailed_position_id: number | null;
+  };
+}
+
+// Formation data from fixture formations include
+export interface Formation {
+  id: number;
+  fixture_id: number;
+  participant_id: number;
+  formation: string; // e.g., "4-3-3"
+  location: string; // "home" | "away"
+}
+
+// Fixture metadata (coaches, formations, etc.)
+export interface FixtureMetadata {
+  id: number;
+  fixture_id: number;
+  type_id: number;
+  value_id: number | null;
+  values: Record<string, unknown>;
+  type?: {
+    id: number;
+    name: string;
     developer_name: string;
   };
 }
