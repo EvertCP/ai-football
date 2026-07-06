@@ -124,6 +124,7 @@ export async function getFixtureById(
         'events.period',
         'events.player',
         'lineups.player',
+        'formations',
         'metadata.type',
         'predictions.type',
       ],
@@ -145,6 +146,7 @@ export async function getFixtureById(
         'events.period',
         'events.player',
         'lineups.player',
+        'formations',
         'metadata.type',
       ],
     });

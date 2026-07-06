@@ -32,6 +32,29 @@ const POSITION_ORDER: Record<string, number> = {
   A: 3,
 };
 
+// Sportmonks position_id → position letter mapping
+const POSITION_ID_MAP: Record<number, string> = {
+  24: 'G', // Goalkeeper
+  25: 'D', // Defender
+  26: 'M', // Midfielder
+  27: 'A', // Attacker
+};
+
+/**
+ * Resolves the position letter for a lineup player.
+ * Uses the lineup's `position` field first, falls back to `player.position_id`.
+ */
+function resolvePosition(player: LineupPlayer): string {
+  if (player.position && player.position.trim() !== '') return player.position;
+  if (player.player?.position_id) return POSITION_ID_MAP[player.player.position_id] || '';
+  // Fallback: derive from formation_field row
+  if (player.formation_field) {
+    const row = parseInt(player.formation_field.split(':')[0], 10);
+    if (row === 1) return 'G';
+  }
+  return '';
+}
+
 /**
  * Derives formation string (e.g., "4-3-3") from lineup formation_field values
  */
@@ -135,7 +158,7 @@ function groupByFormationRows(starters: LineupPlayer[]): LineupPlayer[][] {
 function groupByPosition(starters: LineupPlayer[]): LineupPlayer[][] {
   const groups: Record<string, LineupPlayer[]> = { G: [], D: [], M: [], A: [] };
   starters.forEach(p => {
-    const pos = p.position || 'M';
+    const pos = resolvePosition(p) || 'M';
     if (!groups[pos]) groups[pos] = [];
     groups[pos].push(p);
   });
@@ -146,7 +169,7 @@ function groupByPosition(starters: LineupPlayer[]): LineupPlayer[][] {
  * Player dot on the football pitch
  */
 function PitchPlayer({ player, jersey_color }: { player: LineupPlayer; jersey_color: string }) {
-  const displayName = player.player?.common_name || player.player?.display_name || player.player_name;
+  const displayName = player.player_name || player.player?.display_name || player.player?.common_name || '';
   // Get short surname
   const shortName = displayName.includes(' ')
     ? displayName.split(' ').slice(-1)[0]
@@ -267,9 +290,10 @@ function FullPitch({
  * Bench player row
  */
 function BenchPlayerRow({ player }: { player: LineupPlayer }) {
-  const posLabel = POSITION_LABELS[player.position] || player.position || '—';
-  const posColor = POSITION_COLORS[player.position] || 'bg-gray-100 text-gray-700';
-  const displayName = player.player?.common_name || player.player?.display_name || player.player_name;
+  const pos = resolvePosition(player);
+  const posLabel = POSITION_LABELS[pos] || pos || '—';
+  const posColor = POSITION_COLORS[pos] || 'bg-gray-100 text-gray-700';
+  const displayName = player.player_name || player.player?.display_name || player.player?.common_name || '';
   const imageUrl = player.player?.image_path;
 
   return (
@@ -327,11 +351,12 @@ export default function MatchLineups({
   const homeLineups = lineups.filter(l => l.team_id === homeTeam?.id);
   const awayLineups = lineups.filter(l => l.team_id === awayTeam?.id);
 
-  // Split into starters (type_id=11 or formation_field present) and bench
-  const homeStarters = homeLineups.filter(l => l.type_id === 11 || (l.formation_field !== null && l.formation_field !== ''));
-  const homeBench = homeLineups.filter(l => l.type_id === 12 || (l.type_id !== 11 && (l.formation_field === null || l.formation_field === '')));
-  const awayStarters = awayLineups.filter(l => l.type_id === 11 || (l.formation_field !== null && l.formation_field !== ''));
-  const awayBench = awayLineups.filter(l => l.type_id === 12 || (l.type_id !== 11 && (l.formation_field === null || l.formation_field === '')));
+  // Split into starters and bench strictly by type_id from the API
+  // type_id 11 = starting XI, type_id 12 = bench
+  const homeStarters = homeLineups.filter(l => l.type_id === 11);
+  const homeBench = homeLineups.filter(l => l.type_id === 12);
+  const awayStarters = awayLineups.filter(l => l.type_id === 11);
+  const awayBench = awayLineups.filter(l => l.type_id === 12);
 
   // Get formations
   const homeFormation = getFormation(formations, homeTeam?.id, 'home', homeStarters);
@@ -343,13 +368,13 @@ export default function MatchLineups({
 
   // Sort bench by position then jersey number
   const sortedHomeBench = [...homeBench].sort((a, b) => {
-    const oA = POSITION_ORDER[a.position] ?? 99;
-    const oB = POSITION_ORDER[b.position] ?? 99;
+    const oA = POSITION_ORDER[resolvePosition(a)] ?? 99;
+    const oB = POSITION_ORDER[resolvePosition(b)] ?? 99;
     return oA !== oB ? oA - oB : (a.jersey_number || 0) - (b.jersey_number || 0);
   });
   const sortedAwayBench = [...awayBench].sort((a, b) => {
-    const oA = POSITION_ORDER[a.position] ?? 99;
-    const oB = POSITION_ORDER[b.position] ?? 99;
+    const oA = POSITION_ORDER[resolvePosition(a)] ?? 99;
+    const oB = POSITION_ORDER[resolvePosition(b)] ?? 99;
     return oA !== oB ? oA - oB : (a.jersey_number || 0) - (b.jersey_number || 0);
   });
 
