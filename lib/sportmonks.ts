@@ -1,4 +1,4 @@
-import { Fixture, SportmonksResponse } from '@/types/sportmonks';
+import { Fixture, ScheduleRound, SportmonksResponse } from '@/types/sportmonks';
 
 /**
  * Sportmonks Football API 3.0 Client
@@ -235,6 +235,76 @@ export async function getFixturesByLeague(
   });
 }
 
+/**
+ * Get a team's schedule (fixture IDs across rounds in current competition)
+ * Returns rounds with fixture objects containing id, name, starting_at, state_id
+ */
+export async function getTeamSchedule(
+  teamId: number
+): Promise<SportmonksResponse<ScheduleRound[]>> {
+  return sportmonksFetch<ScheduleRound[]>(
+    `/schedules/teams/${teamId}`,
+    {}
+  );
+}
+
+/**
+ * Fetch multiple fixtures at once by their IDs with player lineup details
+ * Uses the /fixtures/multi/{ids} endpoint
+ * Returns fixtures with full lineup stats per player
+ */
+export async function getFixturesWithLineupStats(
+  fixtureIds: number[]
+): Promise<SportmonksResponse<Fixture[]>> {
+  const idsStr = fixtureIds.join(',');
+  return sportmonksFetch<Fixture[]>(
+    `/fixtures/multi/${idsStr}`,
+    {
+      includes: ['lineups.details.type', 'participants'],
+    }
+  );
+}
+
+/**
+ * Get upcoming (not started) fixtures for today and tomorrow
+ * Used to determine which matches need player picks
+ */
+export async function getUpcomingFixtures(
+  date: string
+): Promise<SportmonksResponse<Fixture[]>> {
+  return sportmonksFetch<Fixture[]>(`/fixtures/date/${date}`, {
+    includes: ['participants', 'league', 'state', 'lineups.player'],
+    filters: {
+      fixtureStates: '1', // NS = Not Started
+    },
+  });
+}
+
+/**
+ * Get recent finished fixtures for a league within a date range.
+ * Used as fallback when team schedule doesn't have enough historical data
+ * (e.g., start of a new season/tournament).
+ * 
+ * Note: The between endpoint has a ~2 month date range limit.
+ */
+export async function getFixturesByLeagueAndDateRange(
+  leagueId: number,
+  startDate: string,
+  endDate: string,
+  perPage: number = 50
+): Promise<SportmonksResponse<Fixture[]>> {
+  return sportmonksFetch<Fixture[]>(
+    `/fixtures/between/${startDate}/${endDate}`,
+    {
+      includes: ['participants'],
+      filters: { fixtureLeagues: leagueId.toString() },
+      perPage,
+      sortBy: 'starting_at',
+      order: 'desc',
+    }
+  );
+}
+
 export default {
   getFixturesByDate,
   getFixtureById,
@@ -242,4 +312,8 @@ export default {
   getFixturesByLeague,
   getHeadToHead,
   getTeamSeasonStats,
+  getTeamSchedule,
+  getFixturesWithLineupStats,
+  getUpcomingFixtures,
+  getFixturesByLeagueAndDateRange,
 };

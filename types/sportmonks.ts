@@ -49,6 +49,7 @@ export interface Fixture {
   placeholder: boolean;
   has_odds: boolean;
   starting_at_timestamp: number;
+  state_id?: number; // 1=NS, 5=FT, etc.
   // Includes (populated via API includes)
   participants?: Team[];
   league?: League;
@@ -232,6 +233,7 @@ export interface LineupPlayer {
     position_id: number;
     detailed_position_id: number | null;
   };
+  details?: LineupDetail[];
 }
 
 // Formation data from fixture formations include
@@ -303,6 +305,68 @@ export interface PredictionFactor {
   name: string;
   description: string;
   impact: 'positive_home' | 'positive_away' | 'neutral';
+}
+
+// Player Picks / Betting Analytics types
+export interface LineupDetail {
+  id: number;
+  player_statistic_id?: number;
+  type_id: number;
+  data: { value: number | string | boolean };
+  type?: {
+    id: number;
+    name: string;
+    developer_name: string;
+    code?: string;
+  };
+}
+
+export interface PlayerMatchStats {
+  fixtureId: number;
+  fixtureName: string;
+  fixtureDate: string;
+  playerId: number;
+  playerName: string;
+  teamId: number;
+  minutesPlayed: number;
+  goals: number;
+  assists: number;
+  shotsTotal: number;
+  shotsOnTarget: number;
+  keyPasses: number;
+  tackles: number;
+  fouls: number;
+  yellowCards: number;
+  rating: number;
+}
+
+export interface PlayerPick {
+  playerId: number;
+  playerName: string;
+  playerImage?: string;
+  teamId: number;
+  teamName: string;
+  teamImage?: string;
+  upcomingFixtureId: number;
+  upcomingFixtureName: string;
+  upcomingFixtureDate: string;
+  picks: PickItem[];
+}
+
+export interface PickItem {
+  stat: string;           // e.g., "SHOTS_ON_TARGET"
+  label: string;          // e.g., "Tiro a puerta"
+  threshold: number;      // e.g., 1 (≥1)
+  hitCount: number;       // e.g., 8 (out of 10)
+  totalMatches: number;   // e.g., 10
+  percentage: number;     // e.g., 80
+  confidence: 'high' | 'medium';  // ≥80 = high, 60-79 = medium
+}
+
+export interface ScheduleRound {
+  id: number;
+  name: string;
+  fixtures?: Fixture[];
 }
 
 // API route request/response types
