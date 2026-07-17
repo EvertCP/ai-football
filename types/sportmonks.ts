@@ -351,6 +351,14 @@ export interface PlayerPick {
   upcomingFixtureName: string;
   upcomingFixtureDate: string;
   picks: PickItem[];
+  matchHistory?: MatchHistoryEntry[];
+}
+
+export interface MatchHistoryEntry {
+  fixtureId: number;
+  fixtureName: string;
+  fixtureDate: string;
+  stats: Record<string, number>; // stat developer_name → value
 }
 
 export interface PickItem {
@@ -361,6 +369,7 @@ export interface PickItem {
   totalMatches: number;   // e.g., 10
   percentage: number;     // e.g., 80
   confidence: 'high' | 'medium';  // ≥80 = high, 60-79 = medium
+  matchValues?: number[]; // per-match values for bar chart (ordered oldest→newest)
 }
 
 export interface ScheduleRound {

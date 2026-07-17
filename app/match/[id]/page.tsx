@@ -137,18 +137,18 @@ export default function MatchDetailPage() {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-32 mb-6" />
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
-            <div className="h-8 bg-gray-200 rounded w-64 mb-4" />
+          <div className="h-6 bg-gray-700 rounded w-32 mb-6" />
+          <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-8">
+            <div className="h-8 bg-gray-700 rounded w-64 mb-4" />
             <div className="flex items-center justify-between">
               <div className="flex-1 text-center space-y-3">
-                <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto" />
-                <div className="h-4 bg-gray-200 rounded w-24 mx-auto" />
+                <div className="w-16 h-16 bg-gray-700 rounded-full mx-auto" />
+                <div className="h-4 bg-gray-700 rounded w-24 mx-auto" />
               </div>
-              <div className="h-10 bg-gray-200 rounded w-20 mx-8" />
+              <div className="h-10 bg-gray-700 rounded w-20 mx-8" />
               <div className="flex-1 text-center space-y-3">
-                <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto" />
-                <div className="h-4 bg-gray-200 rounded w-24 mx-auto" />
+                <div className="w-16 h-16 bg-gray-700 rounded-full mx-auto" />
+                <div className="h-4 bg-gray-700 rounded w-24 mx-auto" />
               </div>
             </div>
           </div>
@@ -161,18 +161,18 @@ export default function MatchDetailPage() {
   if (fixtureError) {
     return (
       <div className="space-y-6">
-        <Link href="/" className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900">
+        <Link href="/" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-white">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Volver a partidos
         </Link>
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+        <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-6 text-center">
           <svg className="w-12 h-12 mx-auto text-red-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h3 className="text-lg font-medium text-red-800 mb-1">Error al cargar el partido</h3>
-          <p className="text-sm text-red-600">{fixtureError}</p>
+          <h3 className="text-lg font-medium text-red-300 mb-1">Error al cargar el partido</h3>
+          <p className="text-sm text-red-400">{fixtureError}</p>
         </div>
       </div>
     );
@@ -207,11 +207,11 @@ export default function MatchDetailPage() {
   // Status
   const getStatusInfo = () => {
     const devName = state?.developer_name;
-    if (!devName || devName === 'NS') return { text: 'Por jugar', color: 'bg-blue-100 text-blue-800' };
-    if (devName === 'FT' || devName === 'AET' || devName === 'FT_PEN') return { text: 'Finalizado', color: 'bg-gray-100 text-gray-800' };
-    if (['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK', 'EXTRA_TIME_BREAK', 'PEN_BREAK'].includes(devName)) return { text: 'En vivo', color: 'bg-green-100 text-green-800' };
-    if (['CANCELLED', 'POSTPONED', 'SUSPENDED', 'ABANDONED', 'INTERRUPTED', 'DELAYED'].includes(devName)) return { text: 'Suspendido', color: 'bg-red-100 text-red-800' };
-    return { text: state?.name || devName, color: 'bg-gray-100 text-gray-600' };
+    if (!devName || devName === 'NS') return { text: 'Por jugar', color: 'bg-blue-500/20 text-blue-300' };
+    if (devName === 'FT' || devName === 'AET' || devName === 'FT_PEN') return { text: 'Finalizado', color: 'bg-gray-600/30 text-gray-300' };
+    if (['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK', 'EXTRA_TIME_BREAK', 'PEN_BREAK'].includes(devName)) return { text: 'En vivo', color: 'bg-green-500/20 text-green-300' };
+    if (['CANCELLED', 'POSTPONED', 'SUSPENDED', 'ABANDONED', 'INTERRUPTED', 'DELAYED'].includes(devName)) return { text: 'Suspendido', color: 'bg-red-500/20 text-red-300' };
+    return { text: state?.name || devName, color: 'bg-gray-600/30 text-gray-400' };
   };
 
   const statusInfo = getStatusInfo();
@@ -229,7 +229,7 @@ export default function MatchDetailPage() {
   return (
     <div className="space-y-6">
       {/* Back Navigation */}
-      <Link href="/" className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors">
+      <Link href="/" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors">
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
@@ -237,14 +237,14 @@ export default function MatchDetailPage() {
       </Link>
 
       {/* Match Header */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 sm:p-8">
+      <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6 sm:p-8">
         {/* League and Status */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             {league?.image_path && (
               <img src={league.image_path} alt={league.name} className="w-6 h-6 object-contain" />
             )}
-            <span className="text-sm font-medium text-gray-600">{league?.name || 'Liga desconocida'}</span>
+            <span className="text-sm font-medium text-gray-400">{league?.name || 'Liga desconocida'}</span>
           </div>
           <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${statusInfo.color}`}>
             {statusInfo.text}
@@ -258,20 +258,20 @@ export default function MatchDetailPage() {
             {homeTeam?.image_path && (
               <img src={homeTeam.image_path} alt={homeTeam.name} className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 object-contain" />
             )}
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">{homeTeam?.name || 'Local'}</h2>
-            <p className="text-xs text-gray-400 mt-1">Local</p>
+            <h2 className="text-lg sm:text-xl font-bold text-white">{homeTeam?.name || 'Local'}</h2>
+            <p className="text-xs text-gray-500 mt-1">Local</p>
           </Link>
 
           {/* Score */}
           <div className="px-6 sm:px-10 text-center">
             {homeGoals !== null && awayGoals !== null ? (
-              <div className="text-4xl sm:text-5xl font-bold text-gray-900">
+              <div className="text-4xl sm:text-5xl font-bold text-white">
                 {homeGoals} - {awayGoals}
               </div>
             ) : (
-              <div className="text-2xl font-bold text-gray-300">VS</div>
+              <div className="text-2xl font-bold text-gray-500">VS</div>
             )}
-            <p className="text-sm text-gray-500 mt-2">{formattedTime}</p>
+            <p className="text-sm text-gray-400 mt-2">{formattedTime}</p>
           </div>
 
           {/* Away Team */}
@@ -279,23 +279,23 @@ export default function MatchDetailPage() {
             {awayTeam?.image_path && (
               <img src={awayTeam.image_path} alt={awayTeam.name} className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 object-contain" />
             )}
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">{awayTeam?.name || 'Visitante'}</h2>
-            <p className="text-xs text-gray-400 mt-1">Visitante</p>
+            <h2 className="text-lg sm:text-xl font-bold text-white">{awayTeam?.name || 'Visitante'}</h2>
+            <p className="text-xs text-gray-500 mt-1">Visitante</p>
           </Link>
         </div>
 
         {/* Match Info */}
-        <div className="mt-6 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
+        <div className="mt-6 pt-4 border-t border-gray-700/30 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
           <span className="capitalize">{formattedDate}</span>
           {fixture.venue && (
             <>
-              <span className="text-gray-300">•</span>
+              <span className="text-gray-600">•</span>
               <span>{fixture.venue.name}, {fixture.venue.city_name}</span>
             </>
           )}
           {fixture.result_info && (
             <>
-              <span className="text-gray-300">•</span>
+              <span className="text-gray-600">•</span>
               <span>{fixture.result_info}</span>
             </>
           )}
@@ -303,13 +303,13 @@ export default function MatchDetailPage() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-white rounded-xl border border-gray-200 p-1.5 flex gap-1">
+      <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-1.5 flex gap-1">
         <button
           onClick={() => setActiveTab('stats')}
           className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
             activeTab === 'stats'
               ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
+              : 'text-gray-400 hover:bg-white/5'
           }`}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,7 +323,7 @@ export default function MatchDetailPage() {
           className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
             activeTab === 'lineups'
               ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
+              : 'text-gray-400 hover:bg-white/5'
           }`}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -337,7 +337,7 @@ export default function MatchDetailPage() {
           className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
             activeTab === 'prediction'
               ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
+              : 'text-gray-400 hover:bg-white/5'
           }`}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -356,41 +356,41 @@ export default function MatchDetailPage() {
           {matchState === 'pre' && (
             <>
               {isLoadingPrediction ? (
-                <div className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
-                  <div className="h-5 bg-gray-200 rounded w-40 mb-4" />
+                <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6 animate-pulse">
+                  <div className="h-5 bg-gray-700 rounded w-40 mb-4" />
                   <div className="space-y-3">
-                    <div className="h-4 bg-gray-200 rounded w-full" />
-                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-700 rounded w-full" />
+                    <div className="h-4 bg-gray-700 rounded w-3/4" />
                   </div>
                 </div>
               ) : (
                 <>
                   {/* xG Comparison */}
                   {(homeForm?.estimatedXG || awayForm?.estimatedXG) && (
-                    <div className="bg-white rounded-xl border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6">
+                      <h3 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
                         <svg className="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                         xG Estimado Pre-Partido
                       </h3>
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="text-center p-4 bg-indigo-50 rounded-lg">
-                          <p className="text-xs font-medium text-indigo-600 mb-1">{homeTeam?.name}</p>
-                          <p className="text-3xl font-bold text-indigo-700">{homeForm?.estimatedXG?.xgFor.toFixed(2) || '—'}</p>
-                          <p className="text-xs text-indigo-500 mt-1">xG a favor / partido</p>
-                          <p className="text-lg font-semibold text-indigo-400 mt-2">{homeForm?.estimatedXG?.xgAgainst.toFixed(2) || '—'}</p>
-                          <p className="text-xs text-indigo-400">xG en contra / partido</p>
+                        <div className="text-center p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
+                          <p className="text-xs font-medium text-indigo-400 mb-1">{homeTeam?.name}</p>
+                          <p className="text-3xl font-bold text-indigo-300">{homeForm?.estimatedXG?.xgFor.toFixed(2) || '—'}</p>
+                          <p className="text-xs text-indigo-400/70 mt-1">xG a favor / partido</p>
+                          <p className="text-lg font-semibold text-indigo-400/60 mt-2">{homeForm?.estimatedXG?.xgAgainst.toFixed(2) || '—'}</p>
+                          <p className="text-xs text-indigo-400/60">xG en contra / partido</p>
                         </div>
-                        <div className="text-center p-4 bg-rose-50 rounded-lg">
-                          <p className="text-xs font-medium text-rose-600 mb-1">{awayTeam?.name}</p>
-                          <p className="text-3xl font-bold text-rose-700">{awayForm?.estimatedXG?.xgFor.toFixed(2) || '—'}</p>
-                          <p className="text-xs text-rose-500 mt-1">xG a favor / partido</p>
-                          <p className="text-lg font-semibold text-rose-400 mt-2">{awayForm?.estimatedXG?.xgAgainst.toFixed(2) || '—'}</p>
-                          <p className="text-xs text-rose-400">xG en contra / partido</p>
+                        <div className="text-center p-4 bg-rose-500/10 border border-rose-500/20 rounded-lg">
+                          <p className="text-xs font-medium text-rose-400 mb-1">{awayTeam?.name}</p>
+                          <p className="text-3xl font-bold text-rose-300">{awayForm?.estimatedXG?.xgFor.toFixed(2) || '—'}</p>
+                          <p className="text-xs text-rose-400/70 mt-1">xG a favor / partido</p>
+                          <p className="text-lg font-semibold text-rose-400/60 mt-2">{awayForm?.estimatedXG?.xgAgainst.toFixed(2) || '—'}</p>
+                          <p className="text-xs text-rose-400/60">xG en contra / partido</p>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-400 mt-3 text-center">
+                      <p className="text-xs text-gray-500 mt-3 text-center">
                         Basado en tiros a puerta, tiros dentro del área y ocasiones claras de los últimos partidos
                       </p>
                     </div>
@@ -398,8 +398,8 @@ export default function MatchDetailPage() {
 
                   {/* Team Form */}
                   {(homeForm || awayForm) && (
-                    <div className="bg-white rounded-xl border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6">
+                      <h3 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
                         <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                         </svg>
@@ -407,43 +407,43 @@ export default function MatchDetailPage() {
                       </h3>
                       <div className="space-y-4">
                         {[
-                          { label: homeTeam?.name || 'Local', form: homeForm, colorClass: 'text-indigo-600' },
-                          { label: awayTeam?.name || 'Visitante', form: awayForm, colorClass: 'text-rose-600' },
+                          { label: homeTeam?.name || 'Local', form: homeForm, colorClass: 'text-indigo-400' },
+                          { label: awayTeam?.name || 'Visitante', form: awayForm, colorClass: 'text-rose-400' },
                         ].map(({ label, form, colorClass }) => form && (
-                          <div key={label} className="border border-gray-100 rounded-lg p-4">
+                          <div key={label} className="border border-gray-700/30 rounded-lg p-4">
                             <div className="flex items-center justify-between mb-3">
-                              <p className="text-sm font-semibold text-gray-900">{label}</p>
+                              <p className="text-sm font-semibold text-gray-200">{label}</p>
                               <div className="flex gap-1">
                                 {form.form.map((r, i) => (
                                   <span key={i} className={`w-6 h-6 rounded text-xs font-bold flex items-center justify-center ${
-                                    r === 'W' ? 'bg-green-100 text-green-700' :
-                                    r === 'D' ? 'bg-gray-100 text-gray-600' :
-                                    'bg-red-100 text-red-700'
+                                    r === 'W' ? 'bg-green-500/20 text-green-400' :
+                                    r === 'D' ? 'bg-gray-600/30 text-gray-400' :
+                                    'bg-red-500/20 text-red-400'
                                   }`}>{r === 'W' ? 'V' : r === 'D' ? 'E' : 'D'}</span>
                                 ))}
                               </div>
                             </div>
                             <div className="grid grid-cols-4 gap-2 text-center">
                               <div>
-                                <p className="text-lg font-bold text-gray-900">{form.wins}</p>
+                                <p className="text-lg font-bold text-white">{form.wins}</p>
                                 <p className="text-xs text-gray-500">Victorias</p>
                               </div>
                               <div>
-                                <p className="text-lg font-bold text-gray-900">{form.draws}</p>
+                                <p className="text-lg font-bold text-white">{form.draws}</p>
                                 <p className="text-xs text-gray-500">Empates</p>
                               </div>
                               <div>
-                                <p className="text-lg font-bold text-gray-900">{form.losses}</p>
+                                <p className="text-lg font-bold text-white">{form.losses}</p>
                                 <p className="text-xs text-gray-500">Derrotas</p>
                               </div>
                               <div>
-                                <p className="text-lg font-bold text-gray-900">{Math.round(form.winRate * 100)}%</p>
+                                <p className="text-lg font-bold text-white">{Math.round(form.winRate * 100)}%</p>
                                 <p className="text-xs text-gray-500">% Vic.</p>
                               </div>
                             </div>
-                            <div className="mt-3 pt-3 border-t border-gray-50 flex justify-between text-xs text-gray-500">
+                            <div className="mt-3 pt-3 border-t border-gray-700/30 flex justify-between text-xs text-gray-500">
                               <span>Goles a favor: <strong className={colorClass}>{form.avgGoalsFor.toFixed(1)}</strong>/partido</span>
-                              <span>En contra: <strong className="text-gray-700">{form.avgGoalsAgainst.toFixed(1)}</strong>/partido</span>
+                              <span>En contra: <strong className="text-gray-400">{form.avgGoalsAgainst.toFixed(1)}</strong>/partido</span>
                             </div>
                           </div>
                         ))}
@@ -453,33 +453,33 @@ export default function MatchDetailPage() {
 
                   {/* H2H */}
                   {h2h && h2h.totalMatches > 0 && (
-                    <div className="bg-white rounded-xl border border-gray-200 p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6">
+                      <h3 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
                         <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                         </svg>
                         Historial Directo
                       </h3>
                       <div className="grid grid-cols-3 gap-3 text-center">
-                        <div className="bg-indigo-50 rounded-lg p-3">
-                          <p className="text-2xl font-bold text-indigo-700">{h2h.team1Wins}</p>
-                          <p className="text-xs text-indigo-600 font-medium">{homeTeam?.name}</p>
+                        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3">
+                          <p className="text-2xl font-bold text-indigo-300">{h2h.team1Wins}</p>
+                          <p className="text-xs text-indigo-400 font-medium">{homeTeam?.name}</p>
                         </div>
-                        <div className="bg-gray-50 rounded-lg p-3">
-                          <p className="text-2xl font-bold text-gray-600">{h2h.draws}</p>
+                        <div className="bg-gray-700/30 border border-gray-600/30 rounded-lg p-3">
+                          <p className="text-2xl font-bold text-gray-300">{h2h.draws}</p>
                           <p className="text-xs text-gray-500 font-medium">Empates</p>
                         </div>
-                        <div className="bg-rose-50 rounded-lg p-3">
-                          <p className="text-2xl font-bold text-rose-700">{h2h.team2Wins}</p>
-                          <p className="text-xs text-rose-600 font-medium">{awayTeam?.name}</p>
+                        <div className="bg-rose-500/10 border border-rose-500/20 rounded-lg p-3">
+                          <p className="text-2xl font-bold text-rose-300">{h2h.team2Wins}</p>
+                          <p className="text-xs text-rose-400 font-medium">{awayTeam?.name}</p>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-400 mt-3 text-center">
+                      <p className="text-xs text-gray-500 mt-3 text-center">
                         {h2h.totalMatches} partidos entre ambos equipos
                       </p>
-                      <div className="flex h-2 rounded-full overflow-hidden mt-3">
+                      <div className="flex h-2 rounded-full overflow-hidden mt-3 bg-gray-700">
                         <div className="bg-indigo-500" style={{ width: `${(h2h.team1Wins / h2h.totalMatches) * 100}%` }} />
-                        <div className="bg-gray-300" style={{ width: `${(h2h.draws / h2h.totalMatches) * 100}%` }} />
+                        <div className="bg-gray-500" style={{ width: `${(h2h.draws / h2h.totalMatches) * 100}%` }} />
                         <div className="bg-rose-500" style={{ width: `${(h2h.team2Wins / h2h.totalMatches) * 100}%` }} />
                       </div>
                     </div>
@@ -487,11 +487,11 @@ export default function MatchDetailPage() {
 
                   {/* Empty state */}
                   {!homeForm && !awayForm && !h2h && (
-                    <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-                      <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6 text-center">
+                      <svg className="w-12 h-12 mx-auto text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                       </svg>
-                      <h3 className="text-sm font-medium text-gray-900 mb-1">Datos pre-partido</h3>
+                      <h3 className="text-sm font-medium text-gray-300 mb-1">Datos pre-partido</h3>
                       <p className="text-xs text-gray-500">
                         No hay suficientes datos históricos para mostrar el análisis pre-partido.
                       </p>
@@ -506,12 +506,12 @@ export default function MatchDetailPage() {
           {(matchState === 'live' || matchState === 'finished') && (
             <>
               {matchState === 'live' && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-2">
+                <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 flex items-center gap-2">
                   <span className="relative flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                   </span>
-                  <p className="text-sm font-medium text-green-800">Partido en vivo — Estadísticas en tiempo real</p>
+                  <p className="text-sm font-medium text-green-300">Partido en vivo — Estadísticas en tiempo real</p>
                 </div>
               )}
               <StatsTable

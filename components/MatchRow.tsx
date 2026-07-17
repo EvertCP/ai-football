@@ -45,17 +45,17 @@ export default function MatchRow({ fixture }: MatchRowProps) {
   return (
     <Link
       href={`/match/${fixture.id}`}
-      className="flex items-center px-3 py-2.5 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 group"
+      className="flex items-center px-3 py-2.5 hover:bg-white/5 transition-colors border-b border-gray-700/30 last:border-b-0 group"
     >
       {/* Time / Status */}
       <div className="w-14 flex-shrink-0 text-center">
         <span className={`text-xs font-medium ${
-          isLive ? 'text-green-600' : isFinished ? 'text-gray-400' : isPostponed ? 'text-red-500' : 'text-gray-600'
+          isLive ? 'text-green-400' : isFinished ? 'text-gray-500' : isPostponed ? 'text-red-400' : 'text-gray-400'
         }`}>
           {statusLabel}
         </span>
         {isFinished && (
-          <p className="text-[10px] text-gray-400">FT</p>
+          <p className="text-[10px] text-gray-500">FT</p>
         )}
       </div>
 
@@ -66,9 +66,9 @@ export default function MatchRow({ fixture }: MatchRowProps) {
           {homeTeam?.image_path ? (
             <img src={homeTeam.image_path} alt="" className="w-4 h-4 object-contain flex-shrink-0" />
           ) : (
-            <div className="w-4 h-4 bg-gray-200 rounded-full flex-shrink-0" />
+            <div className="w-4 h-4 bg-gray-700 rounded-full flex-shrink-0" />
           )}
-          <span className={`text-sm truncate ${isFinished && homeGoals !== null && awayGoals !== null && homeGoals > awayGoals ? 'font-semibold text-gray-900' : 'text-gray-700'}`}>
+          <span className={`text-sm truncate ${isFinished && homeGoals !== null && awayGoals !== null && homeGoals > awayGoals ? 'font-semibold text-white' : 'text-gray-300'}`}>
             {homeTeam?.name || 'Local'}
           </span>
         </div>
@@ -77,9 +77,9 @@ export default function MatchRow({ fixture }: MatchRowProps) {
           {awayTeam?.image_path ? (
             <img src={awayTeam.image_path} alt="" className="w-4 h-4 object-contain flex-shrink-0" />
           ) : (
-            <div className="w-4 h-4 bg-gray-200 rounded-full flex-shrink-0" />
+            <div className="w-4 h-4 bg-gray-700 rounded-full flex-shrink-0" />
           )}
-          <span className={`text-sm truncate ${isFinished && homeGoals !== null && awayGoals !== null && awayGoals > homeGoals ? 'font-semibold text-gray-900' : 'text-gray-700'}`}>
+          <span className={`text-sm truncate ${isFinished && homeGoals !== null && awayGoals !== null && awayGoals > homeGoals ? 'font-semibold text-white' : 'text-gray-300'}`}>
             {awayTeam?.name || 'Visitante'}
           </span>
         </div>
@@ -89,13 +89,13 @@ export default function MatchRow({ fixture }: MatchRowProps) {
       <div className="w-10 flex-shrink-0 text-right space-y-1">
         {homeGoals !== null && awayGoals !== null ? (
           <>
-            <p className={`text-sm ${homeGoals > awayGoals ? 'font-bold text-gray-900' : 'text-gray-600'}`}>{homeGoals}</p>
-            <p className={`text-sm ${awayGoals > homeGoals ? 'font-bold text-gray-900' : 'text-gray-600'}`}>{awayGoals}</p>
+            <p className={`text-sm ${homeGoals > awayGoals ? 'font-bold text-white' : 'text-gray-400'}`}>{homeGoals}</p>
+            <p className={`text-sm ${awayGoals > homeGoals ? 'font-bold text-white' : 'text-gray-400'}`}>{awayGoals}</p>
           </>
         ) : (
           <>
-            <p className="text-sm text-gray-400">-</p>
-            <p className="text-sm text-gray-400">-</p>
+            <p className="text-sm text-gray-500">-</p>
+            <p className="text-sm text-gray-500">-</p>
           </>
         )}
       </div>

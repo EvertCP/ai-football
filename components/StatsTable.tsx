@@ -78,16 +78,16 @@ const STAT_DISPLAY_ORDER: number[] = [
 export default function StatsTable({ statistics, homeTeam, awayTeam }: StatsTableProps) {
   if (!statistics || statistics.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Estadísticas</h3>
+      <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6">
+        <h3 className="text-lg font-semibold text-gray-100 mb-2">Estadísticas</h3>
         <div className="text-center py-8">
-          <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-12 h-12 mx-auto text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-400">
             Estadísticas no disponibles para este partido.
           </p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             Las estadísticas aparecen durante y después del partido.
           </p>
         </div>
@@ -132,25 +132,25 @@ export default function StatsTable({ statistics, homeTeam, awayTeam }: StatsTabl
   });
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Estadísticas</h3>
+    <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6">
+      <h3 className="text-lg font-semibold text-gray-100 mb-4">Estadísticas</h3>
 
       <div className="overflow-hidden">
         {/* Header */}
-        <div className="grid grid-cols-3 gap-4 pb-3 border-b border-gray-200">
-          <div className="text-xs font-semibold text-gray-500 text-center">
+        <div className="grid grid-cols-3 gap-4 pb-3 border-b border-gray-700/30">
+          <div className="text-xs font-semibold text-gray-400 text-center">
             {homeTeam?.name || 'Local'}
           </div>
           <div className="text-xs font-semibold text-gray-500 text-center">
             Estadística
           </div>
-          <div className="text-xs font-semibold text-gray-500 text-center">
+          <div className="text-xs font-semibold text-gray-400 text-center">
             {awayTeam?.name || 'Visitante'}
           </div>
         </div>
 
         {/* Stats Rows */}
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-gray-700/20">
           {statPairs.map((pair) => {
             const homeNum = typeof pair.homeValue === 'number' ? pair.homeValue : parseFloat(String(pair.homeValue));
             const awayNum = typeof pair.awayValue === 'number' ? pair.awayValue : parseFloat(String(pair.awayValue));
@@ -163,13 +163,13 @@ export default function StatsTable({ statistics, homeTeam, awayTeam }: StatsTabl
             return (
               <div key={pair.typeId} className="py-3">
                 <div className="grid grid-cols-3 gap-4 mb-1">
-                  <div className={`text-sm text-center font-medium ${homeHigher ? 'text-indigo-600' : 'text-gray-700'}`}>
+                  <div className={`text-sm text-center font-medium ${homeHigher ? 'text-indigo-400' : 'text-gray-300'}`}>
                     {pair.homeValue}
                   </div>
                   <div className="text-xs text-center text-gray-500 self-center">
                     {pair.name}
                   </div>
-                  <div className={`text-sm text-center font-medium ${awayHigher ? 'text-rose-600' : 'text-gray-700'}`}>
+                  <div className={`text-sm text-center font-medium ${awayHigher ? 'text-rose-400' : 'text-gray-300'}`}>
                     {pair.awayValue}
                   </div>
                 </div>
@@ -178,14 +178,14 @@ export default function StatsTable({ statistics, homeTeam, awayTeam }: StatsTabl
                   <div className="flex items-center gap-1 px-4">
                     <div className="flex-1 flex justify-end">
                       <div
-                        className={`h-1.5 rounded-full transition-all ${homeHigher ? 'bg-indigo-500' : 'bg-gray-300'}`}
+                        className={`h-1.5 rounded-full transition-all ${homeHigher ? 'bg-indigo-500' : 'bg-gray-600'}`}
                         style={{ width: `${homePct}%` }}
                       />
                     </div>
                     <div className="w-1" />
                     <div className="flex-1">
                       <div
-                        className={`h-1.5 rounded-full transition-all ${awayHigher ? 'bg-rose-500' : 'bg-gray-300'}`}
+                        className={`h-1.5 rounded-full transition-all ${awayHigher ? 'bg-rose-500' : 'bg-gray-600'}`}
                         style={{ width: `${awayPct}%` }}
                       />
                     </div>

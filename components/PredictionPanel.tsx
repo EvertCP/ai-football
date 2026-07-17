@@ -32,14 +32,14 @@ export default function PredictionPanel({
 }: PredictionPanelProps) {
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Predicción</h3>
+      <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6">
+        <h3 className="text-lg font-semibold text-gray-100 mb-4">Predicción</h3>
         <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-3/4" />
-          <div className="h-8 bg-gray-200 rounded" />
-          <div className="h-8 bg-gray-200 rounded" />
-          <div className="h-8 bg-gray-200 rounded" />
-          <div className="h-16 bg-gray-200 rounded" />
+          <div className="h-4 bg-gray-700 rounded w-3/4" />
+          <div className="h-8 bg-gray-700 rounded" />
+          <div className="h-8 bg-gray-700 rounded" />
+          <div className="h-8 bg-gray-700 rounded" />
+          <div className="h-16 bg-gray-700 rounded" />
         </div>
       </div>
     );
@@ -47,9 +47,9 @@ export default function PredictionPanel({
 
   if (error) {
     return (
-      <div className="bg-white rounded-xl border border-red-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Predicción</h3>
-        <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm">
+      <div className="bg-[#1a1d2e] rounded-xl border border-red-800/50 p-6">
+        <h3 className="text-lg font-semibold text-gray-100 mb-2">Predicción</h3>
+        <div className="bg-red-900/20 text-red-300 p-3 rounded-lg text-sm">
           {error}
         </div>
       </div>
@@ -58,17 +58,17 @@ export default function PredictionPanel({
 
   if (!prediction) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Predicción</h3>
-        <p className="text-sm text-gray-500">No hay predicción disponible.</p>
+      <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6">
+        <h3 className="text-lg font-semibold text-gray-100 mb-2">Predicción</h3>
+        <p className="text-sm text-gray-400">No hay predicción disponible.</p>
       </div>
     );
   }
 
   const confidenceColors = {
-    low: 'bg-yellow-100 text-yellow-800',
-    medium: 'bg-blue-100 text-blue-800',
-    high: 'bg-green-100 text-green-800',
+    low: 'bg-yellow-500/20 text-yellow-300',
+    medium: 'bg-blue-500/20 text-blue-300',
+    high: 'bg-green-500/20 text-green-300',
   };
 
   const confidenceLabels = {
@@ -78,9 +78,9 @@ export default function PredictionPanel({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
+    <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-lg font-semibold text-gray-900">Predicción</h3>
+        <h3 className="text-lg font-semibold text-gray-100">Predicción</h3>
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${confidenceColors[prediction.confidence]}`}>
           Confianza: {confidenceLabels[prediction.confidence]}
         </span>
@@ -88,8 +88,8 @@ export default function PredictionPanel({
       <div className="mb-5">
         <span className={`text-xs font-medium px-2 py-0.5 rounded ${
           prediction.source === 'sportmonks'
-            ? 'bg-emerald-100 text-emerald-700'
-            : 'bg-gray-100 text-gray-600'
+            ? 'bg-emerald-500/20 text-emerald-300'
+            : 'bg-gray-700/50 text-gray-400'
         }`}>
           {prediction.source === 'sportmonks' ? '⚡ Sportmonks AI' : '🔢 Modelo Heurístico'}
         </span>
@@ -100,14 +100,14 @@ export default function PredictionPanel({
         {/* Home Win */}
         <div>
           <div className="flex justify-between text-sm mb-1">
-            <span className="font-medium text-gray-700">{homeTeamName}</span>
-            <span className="font-semibold text-gray-900">
+            <span className="font-medium text-gray-300">{homeTeamName}</span>
+            <span className="font-semibold text-white">
               {Math.round(prediction.homeWinProbability * 100)}%
             </span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-3">
+          <div className="w-full bg-gray-700 rounded-full h-3">
             <div
-              className="bg-indigo-600 h-3 rounded-full transition-all duration-500"
+              className="bg-indigo-500 h-3 rounded-full transition-all duration-500"
               style={{ width: `${prediction.homeWinProbability * 100}%` }}
             />
           </div>
@@ -116,14 +116,14 @@ export default function PredictionPanel({
         {/* Draw */}
         <div>
           <div className="flex justify-between text-sm mb-1">
-            <span className="font-medium text-gray-700">Empate</span>
-            <span className="font-semibold text-gray-900">
+            <span className="font-medium text-gray-300">Empate</span>
+            <span className="font-semibold text-white">
               {Math.round(prediction.drawProbability * 100)}%
             </span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-3">
+          <div className="w-full bg-gray-700 rounded-full h-3">
             <div
-              className="bg-gray-400 h-3 rounded-full transition-all duration-500"
+              className="bg-gray-500 h-3 rounded-full transition-all duration-500"
               style={{ width: `${prediction.drawProbability * 100}%` }}
             />
           </div>
@@ -132,12 +132,12 @@ export default function PredictionPanel({
         {/* Away Win */}
         <div>
           <div className="flex justify-between text-sm mb-1">
-            <span className="font-medium text-gray-700">{awayTeamName}</span>
-            <span className="font-semibold text-gray-900">
+            <span className="font-medium text-gray-300">{awayTeamName}</span>
+            <span className="font-semibold text-white">
               {Math.round(prediction.awayWinProbability * 100)}%
             </span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-3">
+          <div className="w-full bg-gray-700 rounded-full h-3">
             <div
               className="bg-rose-500 h-3 rounded-full transition-all duration-500"
               style={{ width: `${prediction.awayWinProbability * 100}%` }}
@@ -147,15 +147,15 @@ export default function PredictionPanel({
       </div>
 
       {/* Recommendation */}
-      <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4 mb-5">
-        <p className="text-sm font-medium text-indigo-900 mb-1">Recomendación</p>
-        <p className="text-sm text-indigo-700">{prediction.recommendation}</p>
+      <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-4 mb-5">
+        <p className="text-sm font-medium text-indigo-300 mb-1">Recomendación</p>
+        <p className="text-sm text-indigo-200">{prediction.recommendation}</p>
       </div>
 
       {/* Factors */}
       {prediction.factors.length > 0 && (
         <div>
-          <p className="text-sm font-medium text-gray-700 mb-2">Factores considerados:</p>
+          <p className="text-sm font-medium text-gray-300 mb-2">Factores considerados:</p>
           <div className="space-y-2">
             {prediction.factors.map((factor, index) => (
               <div key={index} className="flex items-start gap-2">
@@ -165,7 +165,7 @@ export default function PredictionPanel({
                   'bg-gray-400'
                 }`} />
                 <div>
-                  <p className="text-xs font-medium text-gray-700">{factor.name}</p>
+                  <p className="text-xs font-medium text-gray-300">{factor.name}</p>
                   <p className="text-xs text-gray-500">{factor.description}</p>
                 </div>
               </div>
@@ -175,7 +175,7 @@ export default function PredictionPanel({
       )}
 
       {/* Disclaimer */}
-      <p className="text-xs text-gray-400 mt-4 pt-4 border-t border-gray-100">
+      <p className="text-xs text-gray-500 mt-4 pt-4 border-t border-gray-700/30">
         * Predicción basada en modelo heurístico. No constituye consejo de apuestas.
       </p>
     </div>

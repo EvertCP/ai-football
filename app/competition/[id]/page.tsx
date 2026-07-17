@@ -188,7 +188,7 @@ export default function CompetitionPage() {
   return (
     <div className="space-y-6">
       {/* Back */}
-      <Link href="/competitions" className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors">
+      <Link href="/competitions" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors">
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
@@ -196,26 +196,26 @@ export default function CompetitionPage() {
       </Link>
 
       {/* Header */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6">
         <div className="flex items-center gap-4">
           {leagueImage && (
             <img src={leagueImage} alt={leagueName} className="w-14 h-14 object-contain" />
           )}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{leagueName || `Competencia #${leagueId}`}</h1>
+            <h1 className="text-2xl font-bold text-white">{leagueName || `Competencia #${leagueId}`}</h1>
             <p className="text-sm text-gray-500 mt-0.5">ID: {leagueId}</p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
+      <div className="flex gap-1 bg-[#1a1d2e] border border-gray-700/50 p-1 rounded-lg w-fit">
         <button
           onClick={() => setActiveTab('calendar')}
           className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
             activeTab === 'calendar'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-gray-400 hover:text-white'
           }`}
         >
           Calendario
@@ -224,8 +224,8 @@ export default function CompetitionPage() {
           onClick={() => setActiveTab('fixtures')}
           className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
             activeTab === 'fixtures'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-gray-400 hover:text-white'
           }`}
         >
           Todos los Partidos
@@ -234,8 +234,8 @@ export default function CompetitionPage() {
           onClick={() => setActiveTab('standings')}
           className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
             activeTab === 'standings'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-gray-400 hover:text-white'
           }`}
         >
           Tabla de Posiciones
@@ -248,23 +248,23 @@ export default function CompetitionPage() {
           <DateCalendar selectedDate={calendarDate} onDateChange={setCalendarDate} />
 
           {calendarError && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">{calendarError}</div>
+            <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4 text-sm text-red-300">{calendarError}</div>
           )}
 
           {isLoadingCalendar ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl border border-gray-200 p-5 animate-pulse h-48" />
+                <div key={i} className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-5 animate-pulse h-48" />
               ))}
             </div>
           ) : calendarFixtures.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-              <p className="text-gray-500 text-sm">No hay partidos de esta competencia para el día seleccionado.</p>
-              <p className="text-gray-400 text-xs mt-1">Prueba con otra fecha usando el calendario.</p>
+            <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-8 text-center">
+              <p className="text-gray-400 text-sm">No hay partidos de esta competencia para el día seleccionado.</p>
+              <p className="text-gray-500 text-xs mt-1">Prueba con otra fecha usando el calendario.</p>
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-sm text-gray-500">{calendarFixtures.length} partido{calendarFixtures.length !== 1 ? 's' : ''} este día</p>
+              <p className="text-sm text-gray-400">{calendarFixtures.length} partido{calendarFixtures.length !== 1 ? 's' : ''} este día</p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {calendarFixtures.map((fixture) => (
                   <MatchCard key={fixture.id} fixture={fixture} />
@@ -279,22 +279,22 @@ export default function CompetitionPage() {
       {activeTab === 'fixtures' && (
         <div className="space-y-6">
           {fixturesError && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">{fixturesError}</div>
+            <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4 text-sm text-red-300">{fixturesError}</div>
           )}
 
           {isLoadingFixtures && page === 1 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl border border-gray-200 p-5 animate-pulse h-48" />
+                <div key={i} className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-5 animate-pulse h-48" />
               ))}
             </div>
           ) : fixtures.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-sm text-gray-500">No se encontraron partidos para esta competencia.</p>
+              <p className="text-sm text-gray-400">No se encontraron partidos para esta competencia.</p>
             </div>
           ) : (
             <>
-              <p className="text-sm text-gray-500">{fixtures.length} partidos cargados</p>
+              <p className="text-sm text-gray-400">{fixtures.length} partidos cargados</p>
               {/* Group fixtures by LOCAL date, today first */}
               {(() => {
                 const today = getLocalDateString();
@@ -323,12 +323,12 @@ export default function CompetitionPage() {
                   );
                   return (
                     <div key={date} className="space-y-3">
-                      <div className={`flex items-center gap-2 ${isToday ? 'text-indigo-700' : 'text-gray-700'}`}>
-                        <span className={`w-2 h-2 rounded-full ${isToday ? 'bg-indigo-500' : 'bg-gray-300'}`} />
-                        <h3 className={`text-sm font-semibold capitalize ${isToday ? 'text-indigo-700' : 'text-gray-700'}`}>
+                      <div className={`flex items-center gap-2 ${isToday ? 'text-indigo-400' : 'text-gray-300'}`}>
+                        <span className={`w-2 h-2 rounded-full ${isToday ? 'bg-indigo-500' : 'bg-gray-600'}`} />
+                        <h3 className={`text-sm font-semibold capitalize ${isToday ? 'text-indigo-400' : 'text-gray-300'}`}>
                           {label}
                         </h3>
-                        <span className="text-xs text-gray-400">({sortedFixtures.length} partidos)</span>
+                        <span className="text-xs text-gray-500">({sortedFixtures.length} partidos)</span>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         {sortedFixtures.map((fixture) => (
@@ -359,35 +359,35 @@ export default function CompetitionPage() {
       {activeTab === 'standings' && (
         <div className="space-y-6">
           {standingsError && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-700">
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 text-sm text-yellow-300">
               Tabla de posiciones no disponible: {standingsError}
             </div>
           )}
 
           {isLoadingStandings ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
+            <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6 animate-pulse">
               <div className="space-y-3">
                 {[...Array(8)].map((_, i) => (
-                  <div key={i} className="h-8 bg-gray-100 rounded" />
+                  <div key={i} className="h-8 bg-gray-700 rounded" />
                 ))}
               </div>
             </div>
           ) : standings.length === 0 && !standingsError ? (
             <div className="text-center py-12">
-              <p className="text-sm text-gray-500">Tabla de posiciones no disponible para esta competencia.</p>
+              <p className="text-sm text-gray-400">Tabla de posiciones no disponible para esta competencia.</p>
             </div>
           ) : (
             standings.map((group) => (
-              <div key={group.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div key={group.id} className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 overflow-hidden">
                 {group.name && standings.length > 1 && (
-                  <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-                    <h3 className="text-sm font-semibold text-gray-700">{group.name}</h3>
+                  <div className="px-4 py-3 bg-[#151823] border-b border-gray-700/30">
+                    <h3 className="text-sm font-semibold text-gray-300">{group.name}</h3>
                   </div>
                 )}
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-gray-100">
+                      <tr className="border-b border-gray-700/30">
                         <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 w-8">#</th>
                         <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Equipo</th>
                         <th className="text-center px-2 py-3 text-xs font-semibold text-gray-500">PJ</th>
@@ -400,15 +400,15 @@ export default function CompetitionPage() {
                         <th className="text-center px-2 py-3 text-xs font-semibold text-gray-500 font-bold">Pts</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
+                    <tbody className="divide-y divide-gray-700/20">
                       {group.standings
                         .map((row, idx) => {
                           const gd = (row.overall?.goals_scored || 0) - (row.overall?.goals_against || 0);
                           return (
-                            <tr key={row.id} className="hover:bg-gray-50">
+                            <tr key={row.id} className="hover:bg-white/5">
                               <td className="px-4 py-2.5 text-xs font-semibold text-gray-500">{idx + 1}</td>
                               <td className="px-4 py-2.5">
-                                <Link href={`/team/${row.participant_id}`} className="flex items-center gap-2 hover:text-indigo-600 transition-colors">
+                                <Link href={`/team/${row.participant_id}`} className="flex items-center gap-2 text-gray-200 hover:text-indigo-400 transition-colors">
                                   {row.participant?.image_path && (
                                     <img src={row.participant.image_path} alt="" className="w-5 h-5 object-contain" />
                                   )}
@@ -417,16 +417,16 @@ export default function CompetitionPage() {
                                   </span>
                                 </Link>
                               </td>
-                              <td className="text-center px-2 py-2.5 text-gray-600">{row.overall?.games_played || 0}</td>
-                              <td className="text-center px-2 py-2.5 text-gray-600">{row.overall?.won || 0}</td>
-                              <td className="text-center px-2 py-2.5 text-gray-600">{row.overall?.draw || 0}</td>
-                              <td className="text-center px-2 py-2.5 text-gray-600">{row.overall?.lost || 0}</td>
-                              <td className="text-center px-2 py-2.5 text-gray-600">{row.overall?.goals_scored || 0}</td>
-                              <td className="text-center px-2 py-2.5 text-gray-600">{row.overall?.goals_against || 0}</td>
-                              <td className={`text-center px-2 py-2.5 font-medium ${gd > 0 ? 'text-green-600' : gd < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                              <td className="text-center px-2 py-2.5 text-gray-400">{row.overall?.games_played || 0}</td>
+                              <td className="text-center px-2 py-2.5 text-gray-400">{row.overall?.won || 0}</td>
+                              <td className="text-center px-2 py-2.5 text-gray-400">{row.overall?.draw || 0}</td>
+                              <td className="text-center px-2 py-2.5 text-gray-400">{row.overall?.lost || 0}</td>
+                              <td className="text-center px-2 py-2.5 text-gray-400">{row.overall?.goals_scored || 0}</td>
+                              <td className="text-center px-2 py-2.5 text-gray-400">{row.overall?.goals_against || 0}</td>
+                              <td className={`text-center px-2 py-2.5 font-medium ${gd > 0 ? 'text-green-400' : gd < 0 ? 'text-red-400' : 'text-gray-400'}`}>
                                 {gd > 0 ? '+' : ''}{gd}
                               </td>
-                              <td className="text-center px-2 py-2.5 font-bold text-gray-900">{row.points}</td>
+                              <td className="text-center px-2 py-2.5 font-bold text-white">{row.points}</td>
                             </tr>
                           );
                         })}

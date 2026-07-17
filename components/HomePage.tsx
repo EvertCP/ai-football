@@ -163,7 +163,7 @@ export default function HomePage() {
               placeholder="Buscar partidos, equipos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2.5 bg-[#1a1d2e] border border-gray-700/50 rounded-xl text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -173,7 +173,7 @@ export default function HomePage() {
           <select
             value={selectedLeague}
             onChange={(e) => setSelectedLeague(e.target.value)}
-            className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-3 py-2 bg-[#1a1d2e] border border-gray-700/50 rounded-lg text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="all">Todas las ligas</option>
             {leagues.map(l => (
@@ -193,7 +193,7 @@ export default function HomePage() {
           <button
             onClick={() => setStatusFilter('all')}
             className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-              statusFilter === 'all' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              statusFilter === 'all' ? 'bg-indigo-600 text-white' : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
             }`}
           >
             Todos ({allFixtures.length})
@@ -201,7 +201,7 @@ export default function HomePage() {
           <button
             onClick={() => setStatusFilter('live')}
             className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-              statusFilter === 'live' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              statusFilter === 'live' ? 'bg-green-600 text-white' : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
             }`}
           >
             En vivo {liveCount > 0 && `(${liveCount})`}
@@ -209,7 +209,7 @@ export default function HomePage() {
           <button
             onClick={() => setStatusFilter('finished')}
             className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-              statusFilter === 'finished' ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              statusFilter === 'finished' ? 'bg-gray-600 text-white' : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
             }`}
           >
             Finalizados
@@ -217,7 +217,7 @@ export default function HomePage() {
           <button
             onClick={() => setStatusFilter('upcoming')}
             className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-              statusFilter === 'upcoming' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              statusFilter === 'upcoming' ? 'bg-blue-600 text-white' : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
             }`}
           >
             Próximos
@@ -226,37 +226,37 @@ export default function HomePage() {
 
         {/* Match List */}
         {isLoading ? (
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 overflow-hidden">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="flex items-center px-3 py-3 border-b border-gray-100 animate-pulse">
-                <div className="w-14 h-4 bg-gray-100 rounded" />
+              <div key={i} className="flex items-center px-3 py-3 border-b border-gray-700/30 animate-pulse">
+                <div className="w-14 h-4 bg-gray-700 rounded" />
                 <div className="flex-1 ml-3 space-y-2">
-                  <div className="h-3 bg-gray-100 rounded w-32" />
-                  <div className="h-3 bg-gray-100 rounded w-28" />
+                  <div className="h-3 bg-gray-700 rounded w-32" />
+                  <div className="h-3 bg-gray-700 rounded w-28" />
                 </div>
-                <div className="w-6 h-8 bg-gray-100 rounded" />
+                <div className="w-6 h-8 bg-gray-700 rounded" />
               </div>
             ))}
           </div>
         ) : error ? (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">{error}</div>
+          <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4 text-sm text-red-300">{error}</div>
         ) : filteredFixtures.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <p className="text-gray-500 text-sm">No hay partidos para este día.</p>
-            <p className="text-gray-400 text-xs mt-1">Selecciona otra fecha o cambia los filtros.</p>
+          <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-8 text-center">
+            <p className="text-gray-400 text-sm">No hay partidos para este día.</p>
+            <p className="text-gray-500 text-xs mt-1">Selecciona otra fecha o cambia los filtros.</p>
           </div>
         ) : (
           <div className="space-y-3">
             {groupedFixtures.map((section, idx) => (
-              <div key={`${section.id}-${section.group}-${idx}`} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div key={`${section.id}-${section.group}-${idx}`} className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 overflow-hidden">
                 {/* League Header */}
-                <div className="flex items-center justify-between px-3 py-2.5 bg-gray-50 border-b border-gray-200">
+                <div className="flex items-center justify-between px-3 py-2.5 bg-[#151823] border-b border-gray-700/30">
                   <div className="flex items-center gap-2">
                     {section.image && (
                       <img src={section.image} alt="" className="w-5 h-5 object-contain" />
                     )}
                     <div>
-                      <span className="text-xs font-semibold text-gray-800">{section.name}</span>
+                      <span className="text-xs font-semibold text-gray-200">{section.name}</span>
                       {section.group && (
                         <span className="ml-2 text-xs text-gray-500">{section.group}</span>
                       )}
@@ -264,7 +264,7 @@ export default function HomePage() {
                   </div>
                   <Link
                     href={`/competition/${section.id}`}
-                    className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                    className="text-xs text-indigo-400 hover:text-indigo-300 font-medium"
                   >
                     Ver liga
                   </Link>
@@ -286,7 +286,7 @@ export default function HomePage() {
       <div className="w-full lg:w-80 flex-shrink-0 space-y-4">
         {/* Featured Match Banner */}
         {featured.length > 0 && (
-          <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-5 text-white">
+          <div className="bg-gradient-to-br from-indigo-700 to-purple-800 rounded-xl p-5 text-white border border-indigo-600/30">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold uppercase tracking-wide opacity-80">
                 {featured[0].league?.name || 'Destacado'}
@@ -331,12 +331,12 @@ export default function HomePage() {
         )}
 
         {/* Recommended Matches */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-800">Partidos Destacados</h3>
+        <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-700/30">
+            <h3 className="text-sm font-semibold text-gray-200">Partidos Destacados</h3>
           </div>
           {featured.length === 0 ? (
-            <div className="p-4 text-center text-sm text-gray-400">Cargando...</div>
+            <div className="p-4 text-center text-sm text-gray-500">Cargando...</div>
           ) : (
             featured.map(fixture => (
               <MatchRow key={fixture.id} fixture={fixture} />
@@ -345,22 +345,22 @@ export default function HomePage() {
         </div>
 
         {/* Quick Links */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h3 className="text-sm font-semibold text-gray-800 mb-3">Accesos Rápidos</h3>
+        <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-4">
+          <h3 className="text-sm font-semibold text-gray-200 mb-3">Accesos Rápidos</h3>
           <div className="space-y-2">
-            <Link href="/competitions" className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 text-sm text-gray-700 transition-colors">
+            <Link href="/competitions" className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 text-sm text-gray-300 transition-colors">
               <svg className="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
               Todas las Competencias
             </Link>
-            <Link href="/competition/732" className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 text-sm text-gray-700 transition-colors">
+            <Link href="/competition/732" className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 text-sm text-gray-300 transition-colors">
               <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
               </svg>
               Mundial 2026
             </Link>
-            <Link href="/competitions" className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 text-sm text-gray-700 transition-colors">
+            <Link href="/competitions" className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 text-sm text-gray-300 transition-colors">
               <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>

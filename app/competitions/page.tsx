@@ -41,15 +41,15 @@ export default function CompetitionsPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Competencias</h1>
+        <h1 className="text-2xl font-bold text-white">Competencias</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl border border-gray-200 p-5 animate-pulse">
+            <div key={i} className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-5 animate-pulse">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gray-200 rounded-lg" />
+                <div className="w-12 h-12 bg-gray-700 rounded-lg" />
                 <div className="space-y-2 flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                  <div className="h-4 bg-gray-700 rounded w-3/4" />
+                  <div className="h-3 bg-gray-700/60 rounded w-1/2" />
                 </div>
               </div>
             </div>
@@ -62,8 +62,8 @@ export default function CompetitionsPage() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Competencias</h1>
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">{error}</div>
+        <h1 className="text-2xl font-bold text-white">Competencias</h1>
+        <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4 text-sm text-red-300">{error}</div>
       </div>
     );
   }
@@ -75,14 +75,14 @@ export default function CompetitionsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Competencias</h1>
-        <p className="text-sm text-gray-500 mt-1">Ligas y torneos disponibles en tu plan</p>
+        <h1 className="text-2xl font-bold text-white">Competencias</h1>
+        <p className="text-sm text-gray-400 mt-1">Ligas y torneos disponibles en tu plan</p>
       </div>
 
       {/* Tournaments */}
       {tournaments.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
             <span className="w-2 h-2 bg-amber-500 rounded-full" />
             Torneos Internacionales
           </h2>
@@ -97,7 +97,7 @@ export default function CompetitionsPage() {
       {/* Domestic Leagues */}
       {domesticLeagues.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
             <span className="w-2 h-2 bg-indigo-500 rounded-full" />
             Ligas Domésticas
           </h2>
@@ -116,25 +116,25 @@ function LeagueCard({ league }: { league: League }) {
   return (
     <Link
       href={`/competition/${league.id}`}
-      className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg hover:border-gray-300 transition-all group"
+      className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-5 hover:border-gray-600/60 hover:bg-[#1e2236] transition-all group"
     >
       <div className="flex items-center gap-4">
         {league.image_path ? (
           <img src={league.image_path} alt={league.name} className="w-12 h-12 object-contain" />
         ) : (
-          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
+            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors truncate">
+          <h3 className="text-sm font-semibold text-gray-200 group-hover:text-indigo-400 transition-colors truncate">
             {league.name}
           </h3>
           <p className="text-xs text-gray-500 mt-0.5 capitalize">{league.type}</p>
         </div>
-        <svg className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-gray-500 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </div>

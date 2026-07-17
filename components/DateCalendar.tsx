@@ -67,12 +67,12 @@ export default function DateCalendar({ selectedDate, onDateChange }: DateCalenda
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
+    <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-700">Calendario</h3>
+        <h3 className="text-sm font-semibold text-gray-300">Calendario</h3>
         <button
           onClick={goToToday}
-          className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+          className="text-xs text-indigo-400 hover:text-indigo-300 font-medium"
         >
           Hoy
         </button>
@@ -81,7 +81,7 @@ export default function DateCalendar({ selectedDate, onDateChange }: DateCalenda
         {/* Left arrow */}
         <button
           onClick={goBack}
-          className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
+          className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-gray-400 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -101,11 +101,11 @@ export default function DateCalendar({ selectedDate, onDateChange }: DateCalenda
                   isSelected
                     ? 'bg-indigo-600 text-white shadow-sm'
                     : day.isToday
-                    ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30'
+                    : 'text-gray-400 hover:bg-white/5'
                 }`}
               >
-                <span className={`text-[10px] font-medium capitalize ${isSelected ? 'text-indigo-100' : 'text-gray-400'}`}>
+                <span className={`text-[10px] font-medium capitalize ${isSelected ? 'text-indigo-200' : 'text-gray-500'}`}>
                   {day.dayName}
                 </span>
                 <span className={`text-xs font-semibold ${isSelected ? 'text-white' : ''}`}>
@@ -119,7 +119,7 @@ export default function DateCalendar({ selectedDate, onDateChange }: DateCalenda
         {/* Right arrow */}
         <button
           onClick={goForward}
-          className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
+          className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-gray-400 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

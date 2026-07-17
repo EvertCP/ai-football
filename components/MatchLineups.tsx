@@ -19,10 +19,10 @@ const POSITION_LABELS: Record<string, string> = {
 };
 
 const POSITION_COLORS: Record<string, string> = {
-  G: 'bg-amber-100 text-amber-800',
-  D: 'bg-blue-100 text-blue-800',
-  M: 'bg-green-100 text-green-800',
-  A: 'bg-red-100 text-red-800',
+  G: 'bg-amber-500/20 text-amber-300',
+  D: 'bg-blue-500/20 text-blue-300',
+  M: 'bg-green-500/20 text-green-300',
+  A: 'bg-red-500/20 text-red-300',
 };
 
 const POSITION_ORDER: Record<string, number> = {
@@ -292,25 +292,25 @@ function FullPitch({
 function BenchPlayerRow({ player }: { player: LineupPlayer }) {
   const pos = resolvePosition(player);
   const posLabel = POSITION_LABELS[pos] || pos || '—';
-  const posColor = POSITION_COLORS[pos] || 'bg-gray-100 text-gray-700';
+  const posColor = POSITION_COLORS[pos] || 'bg-gray-700/50 text-gray-400';
   const displayName = player.player_name || player.player?.display_name || player.player?.common_name || '';
   const imageUrl = player.player?.image_path;
 
   return (
-    <div className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg hover:bg-gray-50 transition-colors">
-      <span className="w-6 h-6 flex items-center justify-center text-[10px] font-bold text-gray-600 bg-gray-100 rounded-full flex-shrink-0">
+    <div className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg hover:bg-white/5 transition-colors">
+      <span className="w-6 h-6 flex items-center justify-center text-[10px] font-bold text-gray-300 bg-gray-700/50 rounded-full flex-shrink-0">
         {player.jersey_number}
       </span>
       {imageUrl ? (
-        <img src={imageUrl} alt={displayName} className="w-7 h-7 rounded-full object-cover flex-shrink-0 border border-gray-200" />
+        <img src={imageUrl} alt={displayName} className="w-7 h-7 rounded-full object-cover flex-shrink-0 border border-gray-600" />
       ) : (
-        <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-          <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+          <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         </div>
       )}
-      <span className="text-xs font-medium text-gray-700 flex-1 truncate">{displayName}</span>
+      <span className="text-xs font-medium text-gray-300 flex-1 truncate">{displayName}</span>
       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${posColor}`}>{posLabel}</span>
     </div>
   );
@@ -325,21 +325,21 @@ export default function MatchLineups({
 }: MatchLineupsProps) {
   if (!lineups || lineups.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-          <svg className="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6">
+        <h3 className="text-lg font-semibold text-gray-100 mb-2 flex items-center gap-2">
+          <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
           Alineaciones
         </h3>
         <div className="text-center py-8">
-          <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-12 h-12 mx-auto text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-400">
             Alineaciones no disponibles para este partido.
           </p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             Las alineaciones se publican aproximadamente una hora antes del inicio.
           </p>
         </div>
@@ -391,19 +391,19 @@ export default function MatchLineups({
       />
 
       {/* Coaches and Bench */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:divide-x md:divide-gray-100">
+      <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:divide-x md:divide-gray-700/30">
           {/* Home Team - Coach & Bench */}
           <div>
             {/* Coach */}
             {homeCoach && (
-              <div className="flex items-center gap-2 mb-4 px-3 py-2.5 bg-indigo-50 rounded-lg">
-                <svg className="w-5 h-5 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center gap-2 mb-4 px-3 py-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
+                <svg className="w-5 h-5 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
                   <p className="text-[10px] font-semibold text-indigo-400 uppercase tracking-wider">Director Técnico</p>
-                  <p className="text-sm font-semibold text-indigo-900">{homeCoach}</p>
+                  <p className="text-sm font-semibold text-indigo-200">{homeCoach}</p>
                 </div>
               </div>
             )}
@@ -427,13 +427,13 @@ export default function MatchLineups({
           <div className="md:pl-6">
             {/* Coach */}
             {awayCoach && (
-              <div className="flex items-center gap-2 mb-4 px-3 py-2.5 bg-rose-50 rounded-lg">
-                <svg className="w-5 h-5 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center gap-2 mb-4 px-3 py-2.5 bg-rose-500/10 border border-rose-500/20 rounded-lg">
+                <svg className="w-5 h-5 text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
                   <p className="text-[10px] font-semibold text-rose-400 uppercase tracking-wider">Director Técnico</p>
-                  <p className="text-sm font-semibold text-rose-900">{awayCoach}</p>
+                  <p className="text-sm font-semibold text-rose-200">{awayCoach}</p>
                 </div>
               </div>
             )}

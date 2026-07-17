@@ -1,4 +1,4 @@
-import { Fixture, LineupPlayer, PlayerMatchStats, PlayerPick, PickItem } from '@/types/sportmonks';
+import { Fixture, LineupPlayer, MatchHistoryEntry, PlayerMatchStats, PlayerPick, PickItem } from '@/types/sportmonks';
 
 /**
  * Pick definitions: which stats to analyze and at what thresholds
@@ -109,6 +109,9 @@ export function calculatePlayerPicks(
         const confidence: 'high' | 'medium' = percentage >= 80 ? 'high' : 'medium';
         const label = threshold > 1 ? `${def.label} (${threshold}+)` : def.label;
 
+        // Per-match values for bar chart (ordered oldest → newest)
+        const matchValues = matchStats.map(ms => getStatFromMatchStats(ms, def.stat));
+
         picks.push({
           stat: def.stat,
           label,
@@ -117,6 +120,7 @@ export function calculatePlayerPicks(
           totalMatches,
           percentage,
           confidence,
+          matchValues,
         });
       }
     }
@@ -132,9 +136,27 @@ export function calculatePlayerPicks(
     return b.percentage - a.percentage;
   });
 
+  // Build match history
+  const matchHistory: MatchHistoryEntry[] = matchStats.map(ms => ({
+    fixtureId: ms.fixtureId,
+    fixtureName: ms.fixtureName,
+    fixtureDate: ms.fixtureDate,
+    stats: {
+      GOALS: ms.goals,
+      ASSISTS: ms.assists,
+      SHOTS_TOTAL: ms.shotsTotal,
+      SHOTS_ON_TARGET: ms.shotsOnTarget,
+      KEY_PASSES: ms.keyPasses,
+      TACKLES: ms.tackles,
+      FOULS: ms.fouls,
+      YELLOWCARDS: ms.yellowCards,
+    },
+  }));
+
   return {
     ...playerInfo,
     picks,
+    matchHistory,
   };
 }
 

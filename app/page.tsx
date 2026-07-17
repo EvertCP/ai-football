@@ -12,7 +12,7 @@ import HomePage from "@/components/HomePage";
  */
 export default function Home() {
   return (
-    <Suspense fallback={<div className="animate-pulse h-96 bg-gray-100 rounded-xl" />}>
+    <Suspense fallback={<div className="animate-pulse h-96 bg-gray-700/30 rounded-xl" />}>
       <HomePage />
     </Suspense>
   );
