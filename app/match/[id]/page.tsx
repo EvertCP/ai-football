@@ -7,6 +7,7 @@ import PredictionPanel from '@/components/PredictionPanel';
 import StatsTable from '@/components/StatsTable';
 import MatchLineups from '@/components/MatchLineups';
 import { Fixture, Prediction } from '@/types/sportmonks';
+import type { ExactScorePrediction } from '@/lib/prediction-engine';
 import { formatMatchTime, formatMatchDateFull } from '@/lib/formatDate';
 
 interface FormData {
@@ -50,6 +51,7 @@ export default function MatchDetailPage() {
 
   const [fixture, setFixture] = useState<Fixture | null>(null);
   const [prediction, setPrediction] = useState<Prediction | null>(null);
+  const [exactScorePrediction, setExactScorePrediction] = useState<ExactScorePrediction | null>(null);
   const [homeForm, setHomeForm] = useState<FormData | null>(null);
   const [awayForm, setAwayForm] = useState<FormData | null>(null);
   const [h2h, setH2H] = useState<H2HData | null>(null);
@@ -116,6 +118,7 @@ export default function MatchDetailPage() {
         }
 
         setPrediction(data.data.prediction);
+        setExactScorePrediction(data.data.exactScorePrediction || null);
         setHomeForm(data.data.homeForm || null);
         setAwayForm(data.data.awayForm || null);
         setH2H(data.data.h2h || null);
@@ -539,6 +542,7 @@ export default function MatchDetailPage() {
       {activeTab === 'prediction' && (
         <PredictionPanel
           prediction={prediction}
+          exactScorePrediction={exactScorePrediction}
           isLoading={isLoadingPrediction}
           error={predictionError}
           homeTeamName={homeTeam?.name || 'Local'}

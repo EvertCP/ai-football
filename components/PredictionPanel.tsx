@@ -1,9 +1,11 @@
 'use client';
 
 import { Prediction } from '@/types/sportmonks';
+import type { ExactScorePrediction } from '@/lib/prediction-engine';
 
 interface PredictionPanelProps {
   prediction: Prediction | null;
+  exactScorePrediction?: ExactScorePrediction | null;
   isLoading: boolean;
   error: string | null;
   homeTeamName: string;
@@ -12,19 +14,12 @@ interface PredictionPanelProps {
 
 /**
  * PredictionPanel Component
- * Displays match prediction with probability bars and recommendation.
- * 
- * TODO: Future enhancements:
- * - Add animated probability bars
- * - Show historical accuracy percentage
- * - Add comparison with bookmaker odds
- * - Add "save prediction" button (requires auth + DB)
- * - Show confidence interval visualization
- * - Add predicted scoreline
- * - Compare ML model vs heuristic predictions
+ * Displays match prediction with probability bars, exact score predictions,
+ * and recommendation.
  */
 export default function PredictionPanel({
   prediction,
+  exactScorePrediction,
   isLoading,
   error,
   homeTeamName,
@@ -145,6 +140,119 @@ export default function PredictionPanel({
           </div>
         </div>
       </div>
+
+      {/* Exact Score Prediction */}
+      {exactScorePrediction && (
+        <div className="mb-6">
+          {/* Expected Goals */}
+          <div className="flex items-center justify-between mb-4 p-3 bg-[#151823] rounded-lg border border-gray-700/30">
+            <div className="text-center flex-1">
+              <p className="text-xs text-gray-500 mb-0.5">Goles esperados</p>
+              <p className="text-lg font-bold text-indigo-400">
+                λ {exactScorePrediction.expectedGoals.home.toFixed(2)}
+              </p>
+              <p className="text-xs text-gray-400">{homeTeamName}</p>
+            </div>
+            <div className="w-px h-10 bg-gray-700/50" />
+            <div className="text-center flex-1">
+              <p className="text-xs text-gray-500 mb-0.5">Goles esperados</p>
+              <p className="text-lg font-bold text-rose-400">
+                λ {exactScorePrediction.expectedGoals.away.toFixed(2)}
+              </p>
+              <p className="text-xs text-gray-400">{awayTeamName}</p>
+            </div>
+          </div>
+
+          {/* Top Exact Scores */}
+          <div className="mb-4">
+            <p className="text-sm font-semibold text-gray-200 mb-3">Marcadores más probables</p>
+            <div className="space-y-2">
+              {exactScorePrediction.topExactScores.map((score, idx) => (
+                <div
+                  key={score.score}
+                  className={`flex items-center justify-between p-2.5 rounded-lg border ${
+                    idx === 0
+                      ? 'bg-indigo-500/10 border-indigo-500/30'
+                      : 'bg-[#151823] border-gray-700/30'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center ${
+                      idx === 0 ? 'bg-indigo-500/30 text-indigo-300' : 'bg-gray-700/50 text-gray-400'
+                    }`}>
+                      {idx + 1}
+                    </span>
+                    <span className={`text-base font-bold tabular-nums ${
+                      idx === 0 ? 'text-white' : 'text-gray-200'
+                    }`}>
+                      {score.score}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 bg-gray-700 rounded-full h-1.5">
+                      <div
+                        className={`h-1.5 rounded-full ${idx === 0 ? 'bg-indigo-500' : 'bg-gray-500'}`}
+                        style={{ width: `${Math.min(score.probability * 100 * 5, 100)}%` }}
+                      />
+                    </div>
+                    <span className={`text-sm font-semibold tabular-nums min-w-[3rem] text-right ${
+                      idx === 0 ? 'text-indigo-300' : 'text-gray-300'
+                    }`}>
+                      {(score.probability * 100).toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Markets: O/U and BTTS */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Over/Under 2.5 */}
+            <div className="bg-[#151823] rounded-lg border border-gray-700/30 p-3">
+              <p className="text-xs text-gray-500 mb-2">Más/Menos 2.5</p>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-300">Over</span>
+                <span className="font-semibold text-white">
+                  {(exactScorePrediction.totals.find(t => t.line === 2.5)?.over ?? 0) * 100 | 0}%
+                </span>
+              </div>
+              <div className="flex justify-between text-sm mt-1">
+                <span className="text-gray-300">Under</span>
+                <span className="font-semibold text-white">
+                  {(exactScorePrediction.totals.find(t => t.line === 2.5)?.under ?? 0) * 100 | 0}%
+                </span>
+              </div>
+            </div>
+            {/* BTTS */}
+            <div className="bg-[#151823] rounded-lg border border-gray-700/30 p-3">
+              <p className="text-xs text-gray-500 mb-2">Ambos anotan</p>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-300">Sí</span>
+                <span className="font-semibold text-white">
+                  {Math.round(exactScorePrediction.btts.yes * 100)}%
+                </span>
+              </div>
+              <div className="flex justify-between text-sm mt-1">
+                <span className="text-gray-300">No</span>
+                <span className="font-semibold text-white">
+                  {Math.round(exactScorePrediction.btts.no * 100)}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Model badge */}
+          <div className="mt-3 flex items-center gap-2">
+            <span className="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-medium">
+              {exactScorePrediction.model}
+            </span>
+            <span className="text-xs text-gray-500">
+              Masa prob: {(exactScorePrediction.metadata.totalProbabilityMass * 100).toFixed(1)}%
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Recommendation */}
       <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-4 mb-5">

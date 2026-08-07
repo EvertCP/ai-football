@@ -1,0 +1,74 @@
+// Prisma Schema — Football Analytics Prediction Persistence
+// Provider: SQLite (zero-config, embedded, ideal for MVP)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+/// Immutable pre-match prediction snapshot.
+/// Created once before a match starts; evaluated after the match ends.
+model MatchPrediction {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  // Match reference
+  fixtureId     Int
+  fixtureName   String
+  fixtureDate   String   // ISO date from Sportmonks (starting_at)
+  leagueId      Int?
+  leagueName    String?
+
+  // Teams
+  homeTeamId    Int
+  homeTeamName  String
+  awayTeamId    Int
+  awayTeamName  String
+
+  // Model info
+  model         String   // e.g., "POISSON_V1", "HEURISTIC_V1"
+
+  // Lambda values used
+  lambdaHome    Float
+  lambdaAway    Float
+  lambdaSource  String   // "estimatedXG" | "goalAverages"
+
+  // 1X2 probabilities
+  probHome      Float
+  probDraw      Float
+  probAway      Float
+
+  // Top exact score predictions (JSON array)
+  topExactScores String  // JSON: [{ score: "1-1", probability: 0.12 }, ...]
+
+  // Over/Under 2.5
+  over25        Float
+  under25       Float
+
+  // BTTS
+  bttsYes       Float
+  bttsNo        Float
+
+  // Metadata
+  maxGoals              Int
+  totalProbabilityMass  Float
+
+  // Post-match evaluation (filled after match finishes)
+  actualHomeGoals   Int?
+  actualAwayGoals   Int?
+  actualScore       String?   // e.g., "2-1"
+  exactScoreHit     Boolean?  // Did #1 prediction match?
+  top3Hit           Boolean?  // Did actual score appear in top 3?
+  top5Hit           Boolean?  // Did actual score appear in top 5?
+  resultHit         Boolean?  // Did 1X2 result match?
+  evaluatedAt       DateTime?
+
+  @@unique([fixtureId, model])
+  @@index([fixtureId])
+  @@index([fixtureDate])
+  @@index([model])
+}

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFixtureById } from '@/lib/sportmonks';
 import { generatePrediction, TeamForm, H2HRecord } from '@/lib/predictor';
 import { Fixture } from '@/types/sportmonks';
+import { predictExactScores, predictExactScoresV2, calculateLambdas, calculateLambdasFromGoals, calculateLambdasV2, calculateTeamStrength, calculateLeagueBaseline, getDefaultLeagueBaseline, PREDICTION_CONFIG } from '@/lib/prediction-engine';
+import type { ExactScorePrediction, LambdaV2Result, TeamMatchHistory } from '@/lib/prediction-engine';
+import { savePrediction } from '@/lib/prediction-store';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,9 +58,141 @@ export async function GET(request: NextRequest) {
       homeTeam && awayTeam ? fetchH2H(homeTeam.id, awayTeam.id) : Promise.resolve(null),
     ]);
 
-    // Generate prediction using real data
+    // Generate heuristic prediction (existing model — preserved for comparison)
     const prediction = generatePrediction(fixture, homeForm, awayForm, h2h);
 
+    // ========== V1 ENGINE (existing) ==========
+    let exactScorePrediction: ExactScorePrediction | null = null;
+    let lambdaInfo: { lambdaHome: number; lambdaAway: number; source: string } | null = null;
+
+    try {
+      if (homeForm?.estimatedXG && awayForm?.estimatedXG) {
+        const lambdaResult = calculateLambdas(
+          homeForm.estimatedXG,
+          awayForm.estimatedXG
+        );
+        if (lambdaResult.lambdaHome > 0 || lambdaResult.lambdaAway > 0) {
+          exactScorePrediction = predictExactScores({
+            lambdaHome: lambdaResult.lambdaHome,
+            lambdaAway: lambdaResult.lambdaAway,
+          });
+          lambdaInfo = {
+            lambdaHome: lambdaResult.lambdaHome,
+            lambdaAway: lambdaResult.lambdaAway,
+            source: 'estimatedXG',
+          };
+          if (lambdaResult.warnings.length > 0) {
+            console.warn('[API/prediction] Lambda V1 warnings:', lambdaResult.warnings);
+          }
+        }
+      } else if (homeForm && awayForm && homeForm.matches >= 3 && awayForm.matches >= 3) {
+        const lambdaResult = calculateLambdasFromGoals(
+          homeForm.avgGoalsFor,
+          homeForm.avgGoalsAgainst,
+          awayForm.avgGoalsFor,
+          awayForm.avgGoalsAgainst
+        );
+        if (lambdaResult.lambdaHome > 0 || lambdaResult.lambdaAway > 0) {
+          exactScorePrediction = predictExactScores({
+            lambdaHome: lambdaResult.lambdaHome,
+            lambdaAway: lambdaResult.lambdaAway,
+          });
+          lambdaInfo = {
+            lambdaHome: lambdaResult.lambdaHome,
+            lambdaAway: lambdaResult.lambdaAway,
+            source: 'goalAverages',
+          };
+        }
+      }
+    } catch (err) {
+      console.error('[API/prediction] V1 engine error:', err);
+    }
+
+    // ========== V2 ENGINE (new — team strength based) ==========
+    let exactScorePredictionV2: ExactScorePrediction | null = null;
+    let lambdaV2Info: LambdaV2Result | null = null;
+
+    try {
+      if (homeForm && awayForm && homeForm.matches >= 3 && awayForm.matches >= 3) {
+        // Build team match history from available form data
+        const homeHistory = buildTeamHistory(homeForm);
+        const awayHistory = buildTeamHistory(awayForm);
+
+        // Use default league baseline (TODO: compute from league data when available)
+        const leagueBaseline = getDefaultLeagueBaseline();
+
+        // Calculate team strengths
+        const homeStrength = calculateTeamStrength(homeHistory, leagueBaseline);
+        const awayStrength = calculateTeamStrength(awayHistory, leagueBaseline);
+
+        // Calculate V2 lambdas
+        const v2Result = calculateLambdasV2({
+          homeStrength,
+          awayStrength,
+          leagueBaseline,
+          isNeutralVenue: !isHomeTeamAtHome(fixture),
+        });
+
+        lambdaV2Info = v2Result;
+
+        if (v2Result.valid) {
+          exactScorePredictionV2 = predictExactScoresV2({
+            lambdaHome: v2Result.lambdaHome,
+            lambdaAway: v2Result.lambdaAway,
+          });
+        }
+
+        if (v2Result.warnings.length > 0) {
+          console.warn('[API/prediction] Lambda V2 warnings:', v2Result.warnings);
+        }
+      }
+    } catch (err) {
+      console.error('[API/prediction] V2 engine error:', err);
+    }
+
+    // Log for observability
+    if (lambdaInfo) {
+      console.log(`[API/prediction] V1 fixtureId=${id} λH=${lambdaInfo.lambdaHome.toFixed(3)} λA=${lambdaInfo.lambdaAway.toFixed(3)} topScore=${exactScorePrediction?.topExactScores[0]?.score} source=${lambdaInfo.source}`);
+    }
+    if (lambdaV2Info) {
+      console.log(`[API/prediction] V2 fixtureId=${id} λH=${lambdaV2Info.lambdaHome.toFixed(3)} λA=${lambdaV2Info.lambdaAway.toFixed(3)} topScore=${exactScorePredictionV2?.topExactScores[0]?.score} homeAttack=${lambdaV2Info.diagnostics.homeAttack.toFixed(3)} awayDefense=${lambdaV2Info.diagnostics.awayDefense.toFixed(3)}`);
+    }
+
+    // Persist prediction snapshots (non-blocking, non-fatal)
+    if (exactScorePrediction && homeTeam && awayTeam && lambdaInfo) {
+      savePrediction({
+        fixtureId: fixture.id,
+        fixtureName: fixture.name,
+        fixtureDate: fixture.starting_at,
+        leagueId: fixture.league?.id,
+        leagueName: fixture.league?.name,
+        homeTeamId: homeTeam.id,
+        homeTeamName: homeTeam.name,
+        awayTeamId: awayTeam.id,
+        awayTeamName: awayTeam.name,
+        prediction: exactScorePrediction,
+        lambdaSource: lambdaInfo.source,
+      }).catch(err => {
+        console.error('[API/prediction] Failed to save V1 prediction:', err);
+      });
+    }
+    if (exactScorePredictionV2 && homeTeam && awayTeam && lambdaV2Info) {
+      savePrediction({
+        fixtureId: fixture.id,
+        fixtureName: fixture.name,
+        fixtureDate: fixture.starting_at,
+        leagueId: fixture.league?.id,
+        leagueName: fixture.league?.name,
+        homeTeamId: homeTeam.id,
+        homeTeamName: homeTeam.name,
+        awayTeamId: awayTeam.id,
+        awayTeamName: awayTeam.name,
+        prediction: exactScorePredictionV2,
+        lambdaSource: 'teamStrengthV2',
+      }).catch(err => {
+        console.error('[API/prediction] Failed to save V2 prediction:', err);
+      });
+    }
 
     return NextResponse.json({
       data: {
@@ -69,6 +204,9 @@ export async function GET(request: NextRequest) {
           league: fixture.league,
         },
         prediction,
+        exactScorePrediction,
+        exactScorePredictionV2,
+        lambdaV2Diagnostics: lambdaV2Info?.diagnostics ?? null,
         homeForm: homeForm ? {
           matches: homeForm.matches,
           wins: homeForm.wins,
@@ -261,4 +399,48 @@ async function fetchH2H(team1Id: number, team2Id: number): Promise<H2HRecord | n
   } catch {
     return null;
   }
+}
+
+/**
+ * Build TeamMatchHistory from TeamForm for V2 engine.
+ * Uses estimated xG or goal averages as proxy.
+ * NOTE: This is a simplified adapter — in production, we'd fetch per-match data.
+ */
+function buildTeamHistory(form: TeamForm): TeamMatchHistory[] {
+  const history: TeamMatchHistory[] = [];
+  const matchCount = form.matches;
+
+  if (matchCount === 0) return history;
+
+  // We don't have per-match xG breakdown from the current API response,
+  // so we create synthetic observations from averages.
+  // Each "match" is assigned increasing daysSince to simulate time decay.
+  const xgFor = form.estimatedXG?.xgFor ?? form.avgGoalsFor;
+  const xgAgainst = form.estimatedXG?.xgAgainst ?? form.avgGoalsAgainst;
+
+  for (let i = 0; i < matchCount; i++) {
+    history.push({
+      xgFor,
+      xgAgainst,
+      daysSince: i * 7, // Approximate: 1 match per week
+      isHome: i % 2 === 0, // Approximate 50/50 home/away split
+    });
+  }
+
+  return history;
+}
+
+/**
+ * Determine if the home team is actually playing at home (not neutral venue).
+ * For now: checks if venue matches home team or if it's a standard league match.
+ */
+function isHomeTeamAtHome(fixture: Fixture): boolean {
+  // If venue info is available, could check against team's home ground.
+  // For now: assume league matches are at home, cup/international may be neutral.
+  // This is a simplification — will be refined with venue data.
+  if (fixture.league) {
+    // Standard league match = home advantage applies
+    return true;
+  }
+  return false;
 }
