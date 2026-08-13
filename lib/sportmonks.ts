@@ -305,7 +305,7 @@ export async function getFixturesByLeagueAndDateRange(
   );
 }
 
-export default {
+const sportmonksApi = {
   getFixturesByDate,
   getFixtureById,
   getLatestFixtures,
@@ -317,3 +317,5 @@ export default {
   getUpcomingFixtures,
   getFixturesByLeagueAndDateRange,
 };
+
+export default sportmonksApi;

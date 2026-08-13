@@ -11,7 +11,7 @@
  */
 
 import { prisma } from './prisma';
-import { evaluatePrediction, getAccuracyStats } from './prediction-store';
+import { evaluatePrediction } from './prediction-store';
 
 /** Full backtesting report structure */
 export interface BacktestReport {

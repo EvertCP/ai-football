@@ -9,8 +9,7 @@ import { calculateTeamStrength, TeamMatchHistory } from '../team-strength';
 import { calculateLeagueBaseline } from '../league-baseline';
 import { calculateLambdasV2 } from '../lambda-v2';
 import { predictExactScoresV2 } from '../index';
-import { exponentialDecay, weightedMean, shrinkage } from '../weighted-xg';
-import { adjustXGForOpponent, adjustXGAForOpponent } from '../opponent-adjustment';
+import { adjustXGForOpponent } from '../opponent-adjustment';
 import { PREDICTION_CONFIG, getShrinkageWeight } from '../config';
 
 // ============ REGRESSION FIXTURES ============

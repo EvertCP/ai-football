@@ -33,7 +33,7 @@ export * from './types';
 export * from './constants';
 
 import { generateFullPrediction } from './score-matrix';
-import { MAX_GOALS, MODEL_POISSON_V1, MODEL_POISSON_V2, TOP_SCORES_COUNT } from './constants';
+import { MAX_GOALS, MODEL_POISSON_V1, MODEL_POISSON_V2 } from './constants';
 import { ExactScorePrediction, PredictionEngineInput } from './types';
 
 /**
