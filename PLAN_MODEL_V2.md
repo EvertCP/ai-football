@@ -345,71 +345,71 @@ interface BacktestReport {
 ## 10. FASES DE IMPLEMENTACIÓN
 
 ### FASE 1 — Backtesting Engine Mejorado
-- [ ] Agregar MAE (Mean Absolute Error) de goles al backtesting
-- [ ] Agregar segmentación por liga y modelo
-- [ ] Agregar comparación lado a lado V1 vs V2
-- [ ] Crear dataset de test con fixtures reales
-- [ ] Protección data leakage documentada y testeada
+- [x] Agregar MAE (Mean Absolute Error) de goles al backtesting
+- [x] Agregar segmentación por liga y modelo
+- [x] Agregar comparación lado a lado V1 vs V2
+- [x] Crear dataset de test con fixtures reales
+- [x] Protección data leakage documentada y testeada
 
 ### FASE 2 — Configuración Centralizada
-- [ ] Crear `config.ts` con todos los parámetros ajustables
-- [ ] Documentar cada parámetro
+- [x] Crear `config.ts` con todos los parámetros ajustables
+- [x] Documentar cada parámetro
 
 ### FASE 3 — Weighted xG con Exponential Decay
-- [ ] `weightedMean()` genérica
-- [ ] `exponentialDecay()` configurable
-- [ ] Tests unitarios e invariantes
+- [x] `weightedMean()` genérica
+- [x] `exponentialDecay()` configurable
+- [x] Tests unitarios e invariantes (23 tests)
 
 ### FASE 4 — League Baseline
-- [ ] `calculateLeagueAverages()` desde datos históricos
-- [ ] Fallback cuando no hay datos de liga
-- [ ] Tests
+- [x] `calculateLeagueAverages()` desde datos históricos
+- [x] Fallback cuando no hay datos de liga
+- [x] Tests
 
 ### FASE 5 — Team Strength Engine
-- [ ] `calculateTeamStrength()` con home/away split
-- [ ] Shrinkage/regularización
-- [ ] Minimum sample size handling
-- [ ] Tests
+- [x] `calculateTeamStrength()` con home/away split
+- [x] Shrinkage/regularización
+- [x] Minimum sample size handling
+- [x] Tests (7 tests)
 
 ### FASE 6 — Opponent Strength Adjustment
-- [ ] `adjustForOpponent()` con defenseWeakness del rival
-- [ ] Protección contra circularidad
-- [ ] Tests
+- [x] `adjustForOpponent()` con defenseWeakness del rival
+- [x] Protección contra circularidad (one-pass, non-iterative)
+- [x] Tests
 
 ### FASE 7 — Lambda V2 Engine
-- [ ] `calculateLambdasV2()` combinando todos los componentes
-- [ ] Fallbacks graceful
-- [ ] Metadata de diagnóstico
-- [ ] Tests unitarios y regression
+- [x] `calculateLambdasV2()` combinando todos los componentes
+- [x] Fallbacks graceful
+- [x] Metadata de diagnóstico
+- [x] Tests unitarios y regression (10 tests)
 
 ### FASE 8 — Integración Backend
-- [ ] Invocar V2 en paralelo con V1 desde API route
-- [ ] Guardar ambos modelos en DB
-- [ ] Logging de diagnóstico
+- [x] Invocar V2 en paralelo con V1 desde API route
+- [x] Guardar ambos modelos en DB
+- [x] Logging de diagnóstico
 
 ### FASE 9 — Comparación V1 vs V2
-- [ ] Ejecutar backtesting sobre histórico
-- [ ] Generar reporte comparativo
-- [ ] Documentar resultados
+- [x] Ejecutar backtesting sobre histórico (endpoint listo)
+- [x] Generar reporte comparativo (`compareModels()`)
+- [ ] Documentar resultados (pendiente: requiere datos reales evaluados)
 
 ### FASE 10 — Frontend (diagnóstico)
-- [ ] Vista `/admin/model-performance`
-- [ ] Inspección individual por fixture
+- [x] Vista `/admin/model-performance`
+- [ ] Inspección individual por fixture (pendiente)
 
 ---
 
 ## 11. CRITERIOS DE ACEPTACIÓN
 
-- [ ] Existe Backtesting Engine con MAE, Brier Score, segmentación
-- [ ] Las predicciones históricas pueden evaluarse sin data leakage
-- [ ] Existe Attack/Defense Rating con home/away split
-- [ ] Existe weighted xG/xGA con exponential decay
-- [ ] Existe shrinkage/regularización
-- [ ] Existe opponent strength adjustment
-- [ ] Existe ExpectedGoalsEngineV2
-- [ ] V1 continúa funcionando sin cambios
-- [ ] Podemos comparar V1 vs V2 con métricas
-- [ ] No existe data leakage (documentado + testeado)
-- [ ] Tests pasan
-- [ ] TypeScript pasa
-- [ ] Build pasa
+- [x] Existe Backtesting Engine con MAE, Brier Score, segmentación
+- [x] Las predicciones históricas pueden evaluarse sin data leakage
+- [x] Existe Attack/Defense Rating con home/away split
+- [x] Existe weighted xG/xGA con exponential decay
+- [x] Existe shrinkage/regularización
+- [x] Existe opponent strength adjustment
+- [x] Existe ExpectedGoalsEngineV2
+- [x] V1 continúa funcionando sin cambios
+- [x] Podemos comparar V1 vs V2 con métricas
+- [x] No existe data leakage (documentado + testeado)
+- [x] Tests pasan (685 tests)
+- [x] TypeScript pasa
+- [x] Build pasa

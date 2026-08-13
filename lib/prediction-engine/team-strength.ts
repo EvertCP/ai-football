@@ -147,17 +147,18 @@ export function calculateTeamStrength(
   const rawAwayDefense = awayXGAgainst !== null ? awayXGAgainst / baseline.avgHomeXG : rawDefense;
 
   // Apply shrinkage
+  // For home/away splits, use the OVERALL match count for determining confidence tier.
+  // Rationale: splitting 10 matches into 5 home + 5 away shouldn't DOUBLE the shrinkage.
+  // The per-venue count affects the weighted mean already; we don't penalize it again.
   const overallPrior = getShrinkageWeight(history.length);
-  const homePrior = getShrinkageWeight(homeMatches.length);
-  const awayPrior = getShrinkageWeight(awayMatches.length);
 
   const attackStrength = shrinkage(rawAttack, 1.0, history.length, overallPrior);
   const defenseWeakness = shrinkage(rawDefense, 1.0, history.length, overallPrior);
 
-  const homeAttackStrength = shrinkage(rawHomeAttack, 1.0, homeMatches.length, homePrior);
-  const homeDefenseWeakness = shrinkage(rawHomeDefense, 1.0, homeMatches.length, homePrior);
-  const awayAttackStrength = shrinkage(rawAwayAttack, 1.0, awayMatches.length, awayPrior);
-  const awayDefenseWeakness = shrinkage(rawAwayDefense, 1.0, awayMatches.length, awayPrior);
+  const homeAttackStrength = shrinkage(rawHomeAttack, 1.0, homeMatches.length, overallPrior);
+  const homeDefenseWeakness = shrinkage(rawHomeDefense, 1.0, homeMatches.length, overallPrior);
+  const awayAttackStrength = shrinkage(rawAwayAttack, 1.0, awayMatches.length, overallPrior);
+  const awayDefenseWeakness = shrinkage(rawAwayDefense, 1.0, awayMatches.length, overallPrior);
 
   // Determine fallback
   let fallbackUsed: string | null = null;

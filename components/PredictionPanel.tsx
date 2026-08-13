@@ -214,13 +214,13 @@ export default function PredictionPanel({
               <div className="flex justify-between text-sm">
                 <span className="text-gray-300">Over</span>
                 <span className="font-semibold text-white">
-                  {(exactScorePrediction.totals.find(t => t.line === 2.5)?.over ?? 0) * 100 | 0}%
+                  {((exactScorePrediction.totals.find(t => t.line === 2.5)?.over ?? 0) * 100).toFixed(1)}%
                 </span>
               </div>
               <div className="flex justify-between text-sm mt-1">
                 <span className="text-gray-300">Under</span>
                 <span className="font-semibold text-white">
-                  {(exactScorePrediction.totals.find(t => t.line === 2.5)?.under ?? 0) * 100 | 0}%
+                  {((exactScorePrediction.totals.find(t => t.line === 2.5)?.under ?? 0) * 100).toFixed(1)}%
                 </span>
               </div>
             </div>
@@ -230,13 +230,13 @@ export default function PredictionPanel({
               <div className="flex justify-between text-sm">
                 <span className="text-gray-300">Sí</span>
                 <span className="font-semibold text-white">
-                  {Math.round(exactScorePrediction.btts.yes * 100)}%
+                  {(exactScorePrediction.btts.yes * 100).toFixed(1)}%
                 </span>
               </div>
               <div className="flex justify-between text-sm mt-1">
                 <span className="text-gray-300">No</span>
                 <span className="font-semibold text-white">
-                  {Math.round(exactScorePrediction.btts.no * 100)}%
+                  {(exactScorePrediction.btts.no * 100).toFixed(1)}%
                 </span>
               </div>
             </div>

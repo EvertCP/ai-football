@@ -54,6 +54,9 @@ export default function RootLayout({
                   </svg>
                   Picks
                 </Link>
+                <Link href="/admin/model-performance" className="text-sm font-medium text-gray-500 hover:text-gray-300 transition-colors">
+                  Admin
+                </Link>
                 {/* TODO: Add authentication button here */}
                 {/* TODO: Add user menu / profile */}
               </div>

@@ -150,12 +150,37 @@ export async function GET(request: NextRequest) {
       console.error('[API/prediction] V2 engine error:', err);
     }
 
-    // Log for observability
-    if (lambdaInfo) {
-      console.log(`[API/prediction] V1 fixtureId=${id} λH=${lambdaInfo.lambdaHome.toFixed(3)} λA=${lambdaInfo.lambdaAway.toFixed(3)} topScore=${exactScorePrediction?.topExactScores[0]?.score} source=${lambdaInfo.source}`);
+    // Structured logging for prediction diagnostics
+    if (lambdaInfo && exactScorePrediction) {
+      const ou25 = exactScorePrediction.totals.find(t => t.line === 2.5);
+      console.log(JSON.stringify({
+        _tag: 'PREDICTION_V1',
+        fixtureId: Number(id),
+        lambdaHome: lambdaInfo.lambdaHome,
+        lambdaAway: lambdaInfo.lambdaAway,
+        topScore: exactScorePrediction.topExactScores[0]?.score,
+        topScoreProb: exactScorePrediction.topExactScores[0]?.probability,
+        over25: ou25?.over,
+        bttsYes: exactScorePrediction.btts.yes,
+        source: lambdaInfo.source,
+      }));
     }
-    if (lambdaV2Info) {
-      console.log(`[API/prediction] V2 fixtureId=${id} λH=${lambdaV2Info.lambdaHome.toFixed(3)} λA=${lambdaV2Info.lambdaAway.toFixed(3)} topScore=${exactScorePredictionV2?.topExactScores[0]?.score} homeAttack=${lambdaV2Info.diagnostics.homeAttack.toFixed(3)} awayDefense=${lambdaV2Info.diagnostics.awayDefense.toFixed(3)}`);
+    if (lambdaV2Info && exactScorePredictionV2) {
+      const ou25v2 = exactScorePredictionV2.totals.find(t => t.line === 2.5);
+      console.log(JSON.stringify({
+        _tag: 'PREDICTION_V2',
+        fixtureId: Number(id),
+        lambdaHome: lambdaV2Info.lambdaHome,
+        lambdaAway: lambdaV2Info.lambdaAway,
+        topScore: exactScorePredictionV2.topExactScores[0]?.score,
+        topScoreProb: exactScorePredictionV2.topExactScores[0]?.probability,
+        over25: ou25v2?.over,
+        bttsYes: exactScorePredictionV2.btts.yes,
+        homeAttack: lambdaV2Info.diagnostics.homeAttack,
+        awayDefense: lambdaV2Info.diagnostics.awayDefense,
+        awayAttack: lambdaV2Info.diagnostics.awayAttack,
+        homeDefense: lambdaV2Info.diagnostics.homeDefense,
+      }));
     }
 
     // Persist prediction snapshots (non-blocking, non-fatal)
