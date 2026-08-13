@@ -27,6 +27,7 @@ interface SavePredictionInput {
  * Uses upsert to avoid duplicates (unique on fixtureId + model).
  */
 export async function savePrediction(input: SavePredictionInput) {
+  if (!prisma) return null;
   const { prediction } = input;
 
   const ou25 = prediction.totals.find(t => t.line === 2.5);
@@ -85,6 +86,8 @@ export async function evaluatePrediction(
   actualHomeGoals: number,
   actualAwayGoals: number
 ) {
+  if (!prisma) return null;
+
   const prediction = await prisma.matchPrediction.findUnique({
     where: {
       fixtureId_model: { fixtureId, model },
@@ -134,6 +137,7 @@ export async function evaluatePrediction(
  * Get all predictions for a fixture.
  */
 export async function getPredictionsByFixture(fixtureId: number) {
+  if (!prisma) return [];
   return prisma.matchPrediction.findMany({
     where: { fixtureId },
     orderBy: { createdAt: 'desc' },
@@ -144,6 +148,7 @@ export async function getPredictionsByFixture(fixtureId: number) {
  * Get aggregated accuracy stats for backtesting.
  */
 export async function getAccuracyStats(model?: string) {
+  if (!prisma) return null;
   const where = {
     evaluatedAt: { not: null as unknown as undefined },
     ...(model ? { model } : {}),

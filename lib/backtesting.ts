@@ -62,6 +62,7 @@ export interface SegmentedReport {
 export async function evaluatePendingPredictions(
   getActualScore: (fixtureId: number) => Promise<{ homeGoals: number; awayGoals: number } | null>
 ): Promise<number> {
+  if (!prisma) return 0;
   const pending = await prisma.matchPrediction.findMany({
     where: { evaluatedAt: null },
     select: { fixtureId: true, model: true },
@@ -97,6 +98,14 @@ export async function evaluatePendingPredictions(
  * Includes all metrics: accuracy, MAE, Brier Score.
  */
 export async function generateBacktestReport(model?: string): Promise<BacktestReport> {
+  if (!prisma) return {
+    model: model || 'unknown', totalMatches: 0,
+    exactScore: { top1Accuracy: 0, top3Accuracy: 0, top5Accuracy: 0 },
+    matchResultAccuracy: 0,
+    goals: { homeMAE: 0, awayMAE: 0, totalMAE: 0, avgPredictedHome: 0, avgPredictedAway: 0, avgActualHome: 0, avgActualAway: 0 },
+    brierScore: 0,
+    benchmark: { randomBrier: 0, description: 'N/A' },
+  };
   const where = {
     evaluatedAt: { not: null as unknown as undefined },
     actualHomeGoals: { not: null as unknown as undefined },
@@ -192,6 +201,8 @@ export async function generateBacktestReport(model?: string): Promise<BacktestRe
  */
 export async function generateSegmentedReport(model?: string): Promise<SegmentedReport> {
   const overall = await generateBacktestReport(model);
+
+  if (!prisma) return { overall, byLeague: {} };
 
   // Get distinct leagues
   const leagues = await prisma.matchPrediction.findMany({

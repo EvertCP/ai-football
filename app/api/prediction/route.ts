@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFixtureById } from '@/lib/sportmonks';
 import { generatePrediction, TeamForm, H2HRecord } from '@/lib/predictor';
 import { Fixture } from '@/types/sportmonks';
-import { predictExactScores, predictExactScoresV2, calculateLambdas, calculateLambdasFromGoals, calculateLambdasV2, calculateTeamStrength, calculateLeagueBaseline, getDefaultLeagueBaseline, PREDICTION_CONFIG } from '@/lib/prediction-engine';
+import { predictExactScores, predictExactScoresV2, calculateLambdas, calculateLambdasFromGoals, calculateLambdasV2, calculateTeamStrength, getDefaultLeagueBaseline } from '@/lib/prediction-engine';
 import type { ExactScorePrediction, LambdaV2Result, TeamMatchHistory } from '@/lib/prediction-engine';
 import { savePrediction } from '@/lib/prediction-store';
 
