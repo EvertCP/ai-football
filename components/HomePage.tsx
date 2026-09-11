@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import MatchRow from '@/components/MatchRow';
 import DateCalendar from '@/components/DateCalendar';
-import { Fixture } from '@/types/sportmonks';
+import { NormalizedFixture as Fixture } from '@/types/football';
 import { formatMatchTime, formatMatchDate, parseUTCDate, getLocalDateString } from '@/lib/formatDate';
 
 interface LeagueWithFixtures {
@@ -120,7 +120,7 @@ export default function HomePage() {
 
   // Group filtered fixtures by league
   const groupedFixtures = useMemo(() => {
-    const groups: Record<string, { id: number; name: string; image: string; fixtures: Fixture[]; group?: string }[]> = {};
+    const groups: Record<string, { id: number; name: string; image: string; fixtures: (Fixture & Record<string, unknown>)[]; group?: string }[]> = {};
     
     filteredFixtures.forEach(f => {
       const lid = f._leagueId || 0;
@@ -130,7 +130,7 @@ export default function HomePage() {
       if (!groups[key]) groups[key] = [];
       
       // Check if fixture has a group (from round/stage)
-      const groupName = f.group?.name || '';
+      const groupName = (f as unknown as Record<string, { name?: string }>).group?.name || (f.league?.round || '');
       let section = groups[key].find(s => s.group === groupName);
       if (!section) {
         section = { id: lid, name: lname, image: limage, fixtures: [], group: groupName };

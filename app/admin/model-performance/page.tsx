@@ -63,7 +63,7 @@ export default function ModelPerformancePage() {
       const data = await res.json();
       setEvalResult(data.data?.message || 'Evaluación completada');
       await fetchReports();
-    } catch (err) {
+    } catch {
       setEvalResult('Error al evaluar predicciones');
     } finally {
       setIsEvaluating(false);

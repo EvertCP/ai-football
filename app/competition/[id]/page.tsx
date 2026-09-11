@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import MatchCard from '@/components/MatchCard';
 import DateCalendar from '@/components/DateCalendar';
-import { Fixture } from '@/types/sportmonks';
+import { NormalizedFixture as Fixture } from '@/types/football';
 import { parseUTCDate, getLocalDateString } from '@/lib/formatDate';
 
 interface CalendarLeague {

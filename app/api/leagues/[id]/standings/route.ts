@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getCurrentSeason, getStandings } from '@/lib/api-football';
 
 export const dynamic = 'force-dynamic';
-
-const SPORTMONKS_API_TOKEN = process.env.SPORTMONKS_API_TOKEN;
-const SPORTMONKS_BASE_URL = process.env.SPORTMONKS_BASE_URL || 'https://api.sportmonks.com/v3/football';
 
 /**
  * GET /api/leagues/[id]/standings
@@ -14,64 +12,52 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const leagueId = params.id;
+    const leagueId = parseInt(params.id, 10);
 
-    const url = new URL(`${SPORTMONKS_BASE_URL}/standings/live/leagues/${leagueId}`);
-    url.searchParams.set('api_token', SPORTMONKS_API_TOKEN || '');
-    url.searchParams.set('include', 'participant;group;details');
-
-    const response = await fetch(url.toString(), {
-      headers: { Accept: 'application/json' },
-    });
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`Sportmonks API error: ${response.status} - ${errorBody}`);
+    const season = await getCurrentSeason(leagueId);
+    if (!season) {
+      return NextResponse.json({ data: [] });
     }
 
-    const data = await response.json();
+    const standingsGroups = await getStandings(leagueId, season);
 
-    // Map details array into a structured object per standing
-    // Type IDs: 129=MP, 130=W, 131=D, 132=L, 133=GF, 134=GC, 179=GD, 187=PTS
-    // Home: 135=MP, 136=W, 137=D, 138=L, 139=GF, 140=GC, 185=PTS
-    // Away: 141=MP, 142=W, 143=D, 144=L, 145=GF, 146=GC, 186=PTS
-    const standings = (data.data || []).map((s: Record<string, unknown>) => {
-      const details = (s.details || []) as Array<{ type_id: number; value: number }>;
-      const detailMap: Record<number, number> = {};
-      details.forEach(d => { detailMap[d.type_id] = d.value; });
-
-      return {
-        ...s,
-        overall: {
-          games_played: detailMap[129] ?? 0,
-          won: detailMap[130] ?? 0,
-          draw: detailMap[131] ?? 0,
-          lost: detailMap[132] ?? 0,
-          goals_scored: detailMap[133] ?? 0,
-          goals_against: detailMap[134] ?? 0,
-          goal_difference: detailMap[179] ?? 0,
-          points: detailMap[187] ?? (s as Record<string, unknown>).points ?? 0,
-        },
-        home: {
-          games_played: detailMap[135] ?? 0,
-          won: detailMap[136] ?? 0,
-          draw: detailMap[137] ?? 0,
-          lost: detailMap[138] ?? 0,
-          goals_scored: detailMap[139] ?? 0,
-          goals_against: detailMap[140] ?? 0,
-          points: detailMap[185] ?? 0,
-        },
-        away: {
-          games_played: detailMap[141] ?? 0,
-          won: detailMap[142] ?? 0,
-          draw: detailMap[143] ?? 0,
-          lost: detailMap[144] ?? 0,
-          goals_scored: detailMap[145] ?? 0,
-          goals_against: detailMap[146] ?? 0,
-          points: detailMap[186] ?? 0,
-        },
-      };
-    });
+    // Flatten groups and map to frontend-compatible format
+    const standings = standingsGroups.flat().map(s => ({
+      position: s.rank,
+      participant: s.team,
+      group: { name: s.group },
+      points: s.points,
+      overall: {
+        games_played: s.all.played,
+        won: s.all.win,
+        draw: s.all.draw,
+        lost: s.all.lose,
+        goals_scored: s.all.goals.for,
+        goals_against: s.all.goals.against,
+        goal_difference: s.goalsDiff,
+        points: s.points,
+      },
+      home: {
+        games_played: s.home.played,
+        won: s.home.win,
+        draw: s.home.draw,
+        lost: s.home.lose,
+        goals_scored: s.home.goals.for,
+        goals_against: s.home.goals.against,
+        points: 0, // API-Football doesn't split points by venue
+      },
+      away: {
+        games_played: s.away.played,
+        won: s.away.win,
+        draw: s.away.draw,
+        lost: s.away.lose,
+        goals_scored: s.away.goals.for,
+        goals_against: s.away.goals.against,
+        points: 0,
+      },
+      form: s.form,
+      description: s.description,
+    }));
 
     return NextResponse.json({
       data: standings,

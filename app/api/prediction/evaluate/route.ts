@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { evaluatePendingPredictions, generateBacktestReport, generateSegmentedReport, compareModels } from '@/lib/backtesting';
-import { getFixtureById } from '@/lib/sportmonks';
+import { getFixtureById } from '@/lib/api-football';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +14,7 @@ export async function POST() {
   try {
     const evaluated = await evaluatePendingPredictions(async (fixtureId) => {
       try {
-        const response = await getFixtureById(fixtureId);
-        const fixture = response.data;
+        const fixture = await getFixtureById(fixtureId);
 
         if (!fixture?.scores || fixture.scores.length === 0) return null;
 
@@ -23,11 +22,11 @@ export async function POST() {
         const state = fixture.state?.developer_name;
         if (state !== 'FT' && state !== 'AET' && state !== 'FT_PEN') return null;
 
-        const homeTeam = fixture.participants?.find(p => p.meta?.location === 'home');
+        const homeTeam = fixture.participants?.find((p: { meta: { location: string } }) => p.meta?.location === 'home');
         let homeGoals = 0;
         let awayGoals = 0;
 
-        fixture.scores.forEach(s => {
+        fixture.scores.forEach((s: { description: string; participant_id: number; score: { goals: number } }) => {
           if (s.description === 'CURRENT') {
             if (s.participant_id === homeTeam?.id) {
               homeGoals = s.score.goals;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { PlayerPick, PickItem } from '@/types/sportmonks';
+import { PlayerPick, PickItem } from '@/types/football';
 
 function formatDateLabel(dateStr: string): string {
   const date = new Date(dateStr + 'T12:00:00');

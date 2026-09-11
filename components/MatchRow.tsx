@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Fixture } from '@/types/sportmonks';
+import { NormalizedFixture as Fixture } from '@/types/football';
 import { formatMatchTime } from '@/lib/formatDate';
 
 interface MatchRowProps {

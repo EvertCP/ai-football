@@ -13,7 +13,7 @@
 import { describe, it, expect } from 'vitest';
 import { generateFullPrediction } from '../score-matrix';
 import { generateGoalDistribution, poissonPmf } from '../poisson';
-import { predictExactScores, predictExactScoresV2 } from '../index';
+import { predictExactScores } from '../index';
 
 // ============================================================
 // PHASE 4 — CONTROLLED SCORE MATRIX TESTS

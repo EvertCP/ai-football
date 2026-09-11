@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Link from "next/link";
+import AuthControls from "@/components/AuthControls";
+import AuthProvider from "@/components/AuthProvider";
+import NavigationLinks from "@/components/NavigationLinks";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -29,6 +32,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0f1117] min-h-screen`}
       >
+        <AuthProvider>
         {/* Navigation */}
         <nav className="bg-[#1a1d2e] border-b border-gray-700/50 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,23 +46,10 @@ export default function RootLayout({
                 <span className="text-lg font-bold text-white">FootballAI</span>
               </Link>
               <div className="flex items-center gap-6">
-                <Link href="/" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
-                  Dashboard
-                </Link>
-                <Link href="/competitions" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
-                  Competencias
-                </Link>
-                <Link href="/picks" className="text-sm font-medium text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Picks
-                </Link>
-                <Link href="/admin/model-performance" className="text-sm font-medium text-gray-500 hover:text-gray-300 transition-colors">
-                  Admin
-                </Link>
+                <NavigationLinks />
                 {/* TODO: Add authentication button here */}
                 {/* TODO: Add user menu / profile */}
+                <AuthControls />
               </div>
             </div>
           </div>
@@ -77,6 +68,7 @@ export default function RootLayout({
             </p>
           </div>
         </footer>
+        </AuthProvider>
       </body>
     </html>
   );

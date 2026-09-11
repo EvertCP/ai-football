@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFixtureById } from '@/lib/sportmonks';
+import { getFixtureById, getTeamFixtures, getHeadToHead, getFixtureStatistics } from '@/lib/api-football';
 import { generatePrediction, TeamForm, H2HRecord } from '@/lib/predictor';
-import { Fixture } from '@/types/sportmonks';
+import { NormalizedFixture } from '@/types/football';
 import { predictExactScores, predictExactScoresV2, calculateLambdas, calculateLambdasFromGoals, calculateLambdasV2, calculateTeamStrength, getDefaultLeagueBaseline } from '@/lib/prediction-engine';
 import type { ExactScorePrediction, LambdaV2Result, TeamMatchHistory } from '@/lib/prediction-engine';
 import { savePrediction } from '@/lib/prediction-store';
 
 export const dynamic = 'force-dynamic';
 
-const SPORTMONKS_API_TOKEN = process.env.SPORTMONKS_API_TOKEN;
-const SPORTMONKS_BASE_URL = process.env.SPORTMONKS_BASE_URL || 'https://api.sportmonks.com/v3/football';
-
 /**
  * GET /api/prediction?fixtureId=123
  * 
  * Generates a prediction for a specific fixture.
- * Fetches fixture data, team form (last matches) and H2H from Sportmonks.
+ * Fetches fixture data, team form (last matches) and H2H from API-Football.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -37,9 +34,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch fixture data from Sportmonks
-    const fixtureResponse = await getFixtureById(id);
-    const fixture = fixtureResponse.data;
+    // Fetch fixture data from API-Football
+    const fixture = await getFixtureById(id);
 
     if (!fixture) {
       return NextResponse.json(
@@ -55,11 +51,12 @@ export async function GET(request: NextRequest) {
     const [homeForm, awayForm, h2h] = await Promise.all([
       homeTeam ? fetchTeamForm(homeTeam.id) : Promise.resolve(null),
       awayTeam ? fetchTeamForm(awayTeam.id) : Promise.resolve(null),
-      homeTeam && awayTeam ? fetchH2H(homeTeam.id, awayTeam.id) : Promise.resolve(null),
+      homeTeam && awayTeam ? fetchH2HRecord(homeTeam.id, awayTeam.id) : Promise.resolve(null),
     ]);
 
     // Generate heuristic prediction (existing model — preserved for comparison)
-    const prediction = generatePrediction(fixture, homeForm, awayForm, h2h);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const prediction = generatePrediction(fixture as any, homeForm, awayForm, h2h);
 
     // ========== V1 ENGINE (existing) ==========
     let exactScorePrediction: ExactScorePrediction | null = null;
@@ -273,37 +270,40 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * Fetch last matches for a team and compute form stats
+ * Fetch last matches for a team and compute form stats using API-Football.
+ * Fetches per-match statistics to get xG data when available.
  */
 async function fetchTeamForm(teamId: number): Promise<TeamForm | null> {
   try {
-    const url = `${SPORTMONKS_BASE_URL}/teams/${teamId}?api_token=${SPORTMONKS_API_TOKEN}&include=latest.scores;latest.participants;latest.state;latest.statistics`;
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const matches: Fixture[] = data.data?.latest || [];
+    // Get last 10 finished matches for this team
+    const matches = await getTeamFixtures(teamId, 10);
 
-    // Take last 10 finished matches
-    const finished = matches
-      .filter((m: Fixture) => m.state?.developer_name === 'FT' || m.state?.developer_name === 'AET')
-      .slice(0, 10);
+    // Filter only finished matches
+    const finished = matches.filter(m =>
+      m.state.developer_name === 'FT' || m.state.developer_name === 'AET'
+    );
 
     if (finished.length === 0) return null;
 
     let wins = 0, draws = 0, losses = 0, goalsFor = 0, goalsAgainst = 0;
 
-    // xG estimation accumulators
-    // Uses: shots on target (86), shots inside box (49), big chances created (580)
-    // Formula: xG ≈ (shots_on_target * 0.10) + (shots_inside_box * 0.08) + (big_chances * 0.35)
-    let totalXGFor = 0, totalXGAgainst = 0, matchesWithStats = 0;
+    // xG accumulators — API-Football may provide expected_goals directly
+    let totalXGFor = 0, totalXGAgainst = 0, matchesWithXG = 0;
 
-    finished.forEach((match: Fixture) => {
-      const isHome = match.participants?.find(p => p.meta?.location === 'home')?.id === teamId;
+    // Fetch statistics for each match in parallel (to get xG)
+    const statsPromises = finished.map(m => getFixtureStatistics(m.id).catch(() => []));
+    const allStats = await Promise.all(statsPromises);
+
+    finished.forEach((match, idx) => {
+      const homeP = match.participants?.find(p => p.meta.location === 'home');
+      const awayP = match.participants?.find(p => p.meta.location === 'away');
+      const isHome = homeP?.id === teamId;
+
+      // Extract goals from scores
       let homeGoals = 0, awayGoals = 0;
       match.scores?.forEach(s => {
         if (s.description === 'CURRENT') {
-          const isHomeScore = s.participant_id === match.participants?.find(p => p.meta?.location === 'home')?.id;
-          if (isHomeScore) homeGoals = s.score.goals;
+          if (homeP && s.participant_id === homeP.id) homeGoals = s.score.goals;
           else awayGoals = s.score.goals;
         }
       });
@@ -317,34 +317,36 @@ async function fetchTeamForm(teamId: number): Promise<TeamForm | null> {
       else if (teamGoals === oppGoals) draws++;
       else losses++;
 
-      // Compute estimated xG from statistics
-      const stats = (match as Fixture & { statistics?: Array<{ type_id: number; participant_id: number; data: { value: number } }> }).statistics;
-      if (stats && stats.length > 0) {
-        matchesWithStats++;
-        const teamStats: Record<number, number> = {};
-        const oppStats: Record<number, number> = {};
-        stats.forEach(s => {
-          const val = typeof s.data?.value === 'number' ? s.data.value : Number(s.data?.value) || 0;
-          if (s.participant_id === teamId) teamStats[s.type_id] = val;
-          else oppStats[s.type_id] = val;
-        });
-        // xG formula based on available stats
-        const teamShotsOnTarget = teamStats[86] || 0;
-        const teamShotsInBox = teamStats[49] || 0;
-        const teamBigChances = teamStats[580] || 0;
-        const oppShotsOnTarget = oppStats[86] || 0;
-        const oppShotsInBox = oppStats[49] || 0;
-        const oppBigChances = oppStats[580] || 0;
+      // Extract xG from statistics (type_id 321 = expected_goals)
+      const matchStats = allStats[idx];
+      if (matchStats && matchStats.length > 0) {
+        const teamXgStat = matchStats.find(s => s.type_id === 321 && s.participant_id === teamId);
+        const oppId = isHome ? awayP?.id : homeP?.id;
+        const oppXgStat = matchStats.find(s => s.type_id === 321 && s.participant_id === oppId);
 
-        totalXGFor += (teamShotsOnTarget * 0.10) + (teamShotsInBox * 0.08) + (teamBigChances * 0.35);
-        totalXGAgainst += (oppShotsOnTarget * 0.10) + (oppShotsInBox * 0.08) + (oppBigChances * 0.35);
+        if (teamXgStat || oppXgStat) {
+          matchesWithXG++;
+          totalXGFor += Number(teamXgStat?.data.value ?? teamGoals);
+          totalXGAgainst += Number(oppXgStat?.data.value ?? oppGoals);
+        } else {
+          // Fallback: estimate from shots on target (86) and shots inside box (49)
+          const teamSOT = matchStats.find(s => s.type_id === 86 && s.participant_id === teamId);
+          const teamSIB = matchStats.find(s => s.type_id === 49 && s.participant_id === teamId);
+          const oppSOT = matchStats.find(s => s.type_id === 86 && s.participant_id === oppId);
+          const oppSIB = matchStats.find(s => s.type_id === 49 && s.participant_id === oppId);
+
+          if (teamSOT || teamSIB) {
+            matchesWithXG++;
+            totalXGFor += (Number(teamSOT?.data.value ?? 0) * 0.10) + (Number(teamSIB?.data.value ?? 0) * 0.08);
+            totalXGAgainst += (Number(oppSOT?.data.value ?? 0) * 0.10) + (Number(oppSIB?.data.value ?? 0) * 0.08);
+          }
+        }
       }
     });
 
-    // Compute estimated xG per match
-    const estimatedXG = matchesWithStats > 0 ? {
-      xgFor: totalXGFor / matchesWithStats,
-      xgAgainst: totalXGAgainst / matchesWithStats,
+    const estimatedXG = matchesWithXG > 0 ? {
+      xgFor: totalXGFor / matchesWithXG,
+      xgAgainst: totalXGAgainst / matchesWithXG,
     } : undefined;
 
     return {
@@ -359,13 +361,13 @@ async function fetchTeamForm(teamId: number): Promise<TeamForm | null> {
       avgGoalsAgainst: goalsAgainst / finished.length,
       winRate: wins / finished.length,
       estimatedXG,
-      form: finished.slice(0, 5).map((match: Fixture) => {
-        const isHome = match.participants?.find(p => p.meta?.location === 'home')?.id === teamId;
+      form: finished.slice(0, 5).map(match => {
+        const homeP = match.participants?.find(p => p.meta.location === 'home');
+        const isHome = homeP?.id === teamId;
         let homeGoals = 0, awayGoals = 0;
         match.scores?.forEach(s => {
           if (s.description === 'CURRENT') {
-            const isHomeScore = s.participant_id === match.participants?.find(p => p.meta?.location === 'home')?.id;
-            if (isHomeScore) homeGoals = s.score.goals;
+            if (homeP && s.participant_id === homeP.id) homeGoals = s.score.goals;
             else awayGoals = s.score.goals;
           }
         });
@@ -376,32 +378,30 @@ async function fetchTeamForm(teamId: number): Promise<TeamForm | null> {
         return 'L';
       }),
     };
-  } catch {
+  } catch (err) {
+    console.error(`[fetchTeamForm] Error for team ${teamId}:`, err);
     return null;
   }
 }
 
 /**
- * Fetch head-to-head record between two teams
+ * Fetch head-to-head record between two teams using API-Football
  */
-async function fetchH2H(team1Id: number, team2Id: number): Promise<H2HRecord | null> {
+async function fetchH2HRecord(team1Id: number, team2Id: number): Promise<H2HRecord | null> {
   try {
-    const url = `${SPORTMONKS_BASE_URL}/fixtures/head-to-head/${team1Id}/${team2Id}?api_token=${SPORTMONKS_API_TOKEN}&per_page=20&include=scores;participants;state`;
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const matches: Fixture[] = data.data || [];
+    const matches = await getHeadToHead(team1Id, team2Id, 20);
 
     if (matches.length === 0) return null;
 
     let team1Wins = 0, team2Wins = 0, drawCount = 0;
 
-    matches.forEach((match: Fixture) => {
+    for (const match of matches) {
+      const homeP = match.participants?.find(p => p.meta.location === 'home');
       let homeGoals = 0, awayGoals = 0;
-      const homeP = match.participants?.find(p => p.meta?.location === 'home');
+
       match.scores?.forEach(s => {
         if (s.description === 'CURRENT') {
-          if (s.participant_id === homeP?.id) homeGoals = s.score.goals;
+          if (homeP && s.participant_id === homeP.id) homeGoals = s.score.goals;
           else awayGoals = s.score.goals;
         }
       });
@@ -413,7 +413,7 @@ async function fetchH2H(team1Id: number, team2Id: number): Promise<H2HRecord | n
       if (t1Goals > t2Goals) team1Wins++;
       else if (t2Goals > t1Goals) team2Wins++;
       else drawCount++;
-    });
+    }
 
     return {
       totalMatches: matches.length,
@@ -437,9 +437,6 @@ function buildTeamHistory(form: TeamForm): TeamMatchHistory[] {
 
   if (matchCount === 0) return history;
 
-  // We don't have per-match xG breakdown from the current API response,
-  // so we create synthetic observations from averages.
-  // Each "match" is assigned increasing daysSince to simulate time decay.
   const xgFor = form.estimatedXG?.xgFor ?? form.avgGoalsFor;
   const xgAgainst = form.estimatedXG?.xgAgainst ?? form.avgGoalsAgainst;
 
@@ -447,8 +444,8 @@ function buildTeamHistory(form: TeamForm): TeamMatchHistory[] {
     history.push({
       xgFor,
       xgAgainst,
-      daysSince: i * 7, // Approximate: 1 match per week
-      isHome: i % 2 === 0, // Approximate 50/50 home/away split
+      daysSince: i * 7,
+      isHome: i % 2 === 0,
     });
   }
 
@@ -457,14 +454,9 @@ function buildTeamHistory(form: TeamForm): TeamMatchHistory[] {
 
 /**
  * Determine if the home team is actually playing at home (not neutral venue).
- * For now: checks if venue matches home team or if it's a standard league match.
  */
-function isHomeTeamAtHome(fixture: Fixture): boolean {
-  // If venue info is available, could check against team's home ground.
-  // For now: assume league matches are at home, cup/international may be neutral.
-  // This is a simplification — will be refined with venue data.
+function isHomeTeamAtHome(fixture: NormalizedFixture): boolean {
   if (fixture.league) {
-    // Standard league match = home advantage applies
     return true;
   }
   return false;

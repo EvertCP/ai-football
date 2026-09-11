@@ -1,4 +1,7 @@
-import { Fixture, LineupPlayer, MatchHistoryEntry, PlayerMatchStats, PlayerPick, PickItem } from '@/types/sportmonks';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// NOTE: This module is temporarily disabled during the API migration.
+// It will be re-implemented with API-Football player stats endpoints.
+import { LineupPlayer, MatchHistoryEntry, PlayerMatchStats, PlayerPick, PickItem } from '@/types/football';
 
 /**
  * Pick definitions: which stats to analyze and at what thresholds
@@ -37,13 +40,13 @@ function getStatValue(player: LineupPlayer, statName: string): number {
  * Extract per-match stats for a specific player from a fixture's lineups
  */
 export function extractPlayerStats(
-  fixture: Fixture,
+  fixture: any,
   playerId: number
 ): PlayerMatchStats | null {
   if (!fixture.lineups) return null;
 
-  const playerLineup = fixture.lineups.find(
-    l => l.player_id === playerId && l.details && l.details.length > 0
+  const playerLineup = (fixture.lineups as any[]).find(
+    (l: any) => l.player_id === playerId && l.details && l.details.length > 0
   );
   if (!playerLineup) return null;
 

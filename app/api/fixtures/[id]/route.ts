@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFixtureById } from '@/lib/sportmonks';
+import { getFixtureById } from '@/lib/api-football';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,12 +8,6 @@ export const dynamic = 'force-dynamic';
  * 
  * Get detailed information about a specific fixture.
  * Includes statistics, scores, venue, and all available data.
- * 
- * TODO: Future enhancements:
- * - Cache individual fixture data
- * - Add head-to-head data
- * - Add team form (last 5 matches)
- * - Add player statistics
  */
 export async function GET(
   request: NextRequest,
@@ -29,10 +23,10 @@ export async function GET(
       );
     }
 
-    const response = await getFixtureById(fixtureId);
+    const fixture = await getFixtureById(fixtureId);
 
     return NextResponse.json({
-      data: response.data || null,
+      data: fixture || null,
     });
   } catch (error) {
     console.error(`[API/fixtures/${params.id}] Error:`, error);

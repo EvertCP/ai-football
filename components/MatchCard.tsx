@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Fixture } from '@/types/sportmonks';
+import { NormalizedFixture as Fixture } from '@/types/football';
 import { formatMatchTime, formatMatchDate } from '@/lib/formatDate';
 
 interface MatchCardProps {
@@ -59,7 +59,7 @@ export default function MatchCard({ fixture }: MatchCardProps) {
     if (['CANCELLED', 'POSTPONED', 'SUSPENDED', 'ABANDONED', 'INTERRUPTED', 'DELAYED'].includes(devName)) {
       return { text: 'Suspendido', color: 'bg-red-500/20 text-red-300' };
     }
-    return { text: state?.name || 'Desconocido', color: 'bg-gray-600/30 text-gray-400' };
+    return { text: state?.long || 'Desconocido', color: 'bg-gray-600/30 text-gray-400' };
   };
 
   const statusBadge = getStatusBadge();

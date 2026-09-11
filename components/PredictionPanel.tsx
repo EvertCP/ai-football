@@ -1,6 +1,6 @@
 'use client';
 
-import { Prediction } from '@/types/sportmonks';
+import { Prediction } from '@/types/football';
 import type { ExactScorePrediction } from '@/lib/prediction-engine';
 
 interface PredictionPanelProps {
@@ -82,11 +82,11 @@ export default function PredictionPanel({
       </div>
       <div className="mb-5">
         <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-          prediction.source === 'sportmonks'
+          prediction.source === 'api-football'
             ? 'bg-emerald-500/20 text-emerald-300'
             : 'bg-gray-700/50 text-gray-400'
         }`}>
-          {prediction.source === 'sportmonks' ? '⚡ Sportmonks AI' : '🔢 Modelo Heurístico'}
+          {prediction.source === 'api-football' ? '⚡ API-Football' : '🔢 Modelo Heurístico'}
         </span>
       </div>
 

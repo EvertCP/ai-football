@@ -1,6 +1,6 @@
 'use client';
 
-import { LineupPlayer, Team, Formation, FixtureMetadata } from '@/types/sportmonks';
+import { LineupPlayer, Team, Formation, FixtureMetadata } from '@/types/football';
 
 interface MatchLineupsProps {
   lineups: LineupPlayer[];

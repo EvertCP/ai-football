@@ -6,7 +6,7 @@ import Link from 'next/link';
 import PredictionPanel from '@/components/PredictionPanel';
 import StatsTable from '@/components/StatsTable';
 import MatchLineups from '@/components/MatchLineups';
-import { Fixture, Prediction } from '@/types/sportmonks';
+import { NormalizedFixture as Fixture, Prediction } from '@/types/football';
 import type { ExactScorePrediction } from '@/lib/prediction-engine';
 import { formatMatchTime, formatMatchDateFull } from '@/lib/formatDate';
 
@@ -214,7 +214,7 @@ export default function MatchDetailPage() {
     if (devName === 'FT' || devName === 'AET' || devName === 'FT_PEN') return { text: 'Finalizado', color: 'bg-gray-600/30 text-gray-300' };
     if (['INPLAY_1ST_HALF', 'INPLAY_2ND_HALF', 'HT', 'INPLAY_ET', 'INPLAY_ET_2ND_HALF', 'INPLAY_PENALTIES', 'BREAK', 'EXTRA_TIME_BREAK', 'PEN_BREAK'].includes(devName)) return { text: 'En vivo', color: 'bg-green-500/20 text-green-300' };
     if (['CANCELLED', 'POSTPONED', 'SUSPENDED', 'ABANDONED', 'INTERRUPTED', 'DELAYED'].includes(devName)) return { text: 'Suspendido', color: 'bg-red-500/20 text-red-300' };
-    return { text: state?.name || devName, color: 'bg-gray-600/30 text-gray-400' };
+    return { text: state?.long || devName, color: 'bg-gray-600/30 text-gray-400' };
   };
 
   const statusInfo = getStatusInfo();
@@ -293,13 +293,13 @@ export default function MatchDetailPage() {
           {fixture.venue && (
             <>
               <span className="text-gray-600">•</span>
-              <span>{fixture.venue.name}, {fixture.venue.city_name}</span>
+              <span>{fixture.venue.name}, {fixture.venue.city}</span>
             </>
           )}
-          {fixture.result_info && (
+          {(fixture as unknown as Record<string, string>).result_info && (
             <>
               <span className="text-gray-600">•</span>
-              <span>{fixture.result_info}</span>
+              <span>{(fixture as unknown as Record<string, string>).result_info}</span>
             </>
           )}
         </div>
@@ -530,9 +530,9 @@ export default function MatchDetailPage() {
       {/* --- ALINEACIÓN --- */}
       {activeTab === 'lineups' && (
         <MatchLineups
-          lineups={fixture.lineups || []}
-          formations={fixture.formations}
-          metadata={fixture.metadata}
+          lineups={fixture.lineups as unknown as import('@/types/football').LineupPlayer[] || []}
+          formations={(fixture as unknown as Record<string, unknown>).formations as import('@/types/football').Formation[] | undefined}
+          metadata={(fixture as unknown as Record<string, unknown>).metadata as import('@/types/football').FixtureMetadata[] | undefined}
           homeTeam={homeTeam}
           awayTeam={awayTeam}
         />

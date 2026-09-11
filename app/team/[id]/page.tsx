@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Fixture } from '@/types/sportmonks';
+import { NormalizedFixture as Fixture } from '@/types/football';
 import { formatMatchTime, formatMatchDate } from '@/lib/formatDate';
 
 interface Player {
@@ -518,7 +518,7 @@ function FixtureRow({ fixture, teamId, showResult }: { fixture: Fixture; teamId:
               ? 'bg-green-100 text-green-700' :
             'bg-gray-100 text-gray-500'
           }`}>
-            {fixture.state?.short_name || 'TBD'}
+            {fixture.state?.short || 'TBD'}
           </span>
         </div>
       )}

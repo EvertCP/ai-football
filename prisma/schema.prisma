@@ -1,5 +1,5 @@
 // Prisma Schema — Football Analytics Prediction Persistence
-// Provider: SQLite (zero-config, embedded, ideal for MVP)
+// Provider: PostgreSQL (production-ready)
 
 generator client {
   provider = "prisma-client"
@@ -7,7 +7,41 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+}
+
+model User {
+  id                   String    @id @default(uuid())
+  name                 String?
+  email                String    @unique
+  emailVerified        DateTime?
+  image                 String?
+  passwordHash         String?
+  role                 String    @default("USER")
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  subscriptionStatus   String?
+  subscriptionEndsAt   DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([role])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 /// Immutable pre-match prediction snapshot.

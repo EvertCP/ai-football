@@ -1,9 +1,14 @@
-import { Fixture, Prediction, PredictionFactor } from '@/types/sportmonks';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Prediction, PredictionFactor } from '@/types/football';
+
+// NormalizedFixture is used loosely here — accepts any fixture-like object
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+type Fixture = Record<string, any>;
 
 /**
  * Football Match Predictor
  * 
- * Uses real data from Sportmonks API:
+ * Uses real data from API-Football:
  * - Team form (last 10 matches: W/D/L, goals scored/conceded)
  * - Head-to-head record
  * - Match statistics (for live/finished matches)
@@ -93,8 +98,8 @@ export function generatePrediction(
   let awayWin = BASE_AWAY_WIN;
   const factors: PredictionFactor[] = [];
 
-  const homeTeam = fixture.participants?.find(p => p.meta?.location === 'home');
-  const awayTeam = fixture.participants?.find(p => p.meta?.location === 'away');
+  const homeTeam = fixture.participants?.find((p: any) => p.meta?.location === 'home');
+  const awayTeam = fixture.participants?.find((p: any) => p.meta?.location === 'away');
   const homeName = homeTeam?.name || 'Local';
   const awayName = awayTeam?.name || 'Visitante';
 
@@ -265,7 +270,7 @@ export function generatePrediction(
     recommendation,
     confidence,
     factors,
-    source: 'heuristic',
+    source: 'heuristic' as const,
   };
 }
 
@@ -401,8 +406,8 @@ function analyzeStatistics(fixture: Fixture) {
 
   if (!fixture.statistics) return { homeAdjust, drawAdjust, awayAdjust };
 
-  const homeTeam = fixture.participants?.find(p => p.meta?.location === 'home');
-  const awayTeam = fixture.participants?.find(p => p.meta?.location === 'away');
+  const homeTeam = fixture.participants?.find((p: any) => p.meta?.location === 'home');
+  const awayTeam = fixture.participants?.find((p: any) => p.meta?.location === 'away');
 
   if (!homeTeam || !awayTeam) return { homeAdjust, drawAdjust, awayAdjust };
 
@@ -420,8 +425,8 @@ function analyzeStatistics(fixture: Fixture) {
 
   for (const [typeIdStr, weight] of Object.entries(keyStats)) {
     const typeId = parseInt(typeIdStr);
-    const homeStat = fixture.statistics.find(s => s.type_id === typeId && s.participant_id === homeTeam.id);
-    const awayStat = fixture.statistics.find(s => s.type_id === typeId && s.participant_id === awayTeam.id);
+    const homeStat = fixture.statistics.find((s: any) => s.type_id === typeId && s.participant_id === homeTeam.id);
+    const awayStat = fixture.statistics.find((s: any) => s.type_id === typeId && s.participant_id === awayTeam.id);
     const hv = typeof homeStat?.data?.value === 'number' ? homeStat.data.value : 0;
     const av = typeof awayStat?.data?.value === 'number' ? awayStat.data.value : 0;
     if (hv + av > 0) {
@@ -453,9 +458,9 @@ function analyzeScores(fixture: Fixture): {
   let homeGoals = 0;
   let awayGoals = 0;
 
-  const homeTeam = fixture.participants?.find(p => p.meta?.location === 'home');
+  const homeTeam = fixture.participants?.find((p: any) => p.meta?.location === 'home');
 
-  fixture.scores?.forEach(score => {
+  fixture.scores?.forEach((score: any) => {
     if (score.description === 'CURRENT') {
       if (score.participant_id === homeTeam?.id) {
         homeGoals = score.score.goals;

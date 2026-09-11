@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import MatchCard from '@/components/MatchCard';
-import { Fixture } from '@/types/sportmonks';
+import { NormalizedFixture as Fixture } from '@/types/football';
 
 /**
  * RecentMatches Component

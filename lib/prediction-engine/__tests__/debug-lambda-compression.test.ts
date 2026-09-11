@@ -9,7 +9,7 @@ import { calculateTeamStrength, TeamMatchHistory } from '../team-strength';
 import { calculateLambdasV2 } from '../lambda-v2';
 import { getDefaultLeagueBaseline } from '../league-baseline';
 import { shrinkage } from '../weighted-xg';
-import { getShrinkageWeight, PREDICTION_CONFIG } from '../config';
+import { getShrinkageWeight } from '../config';
 import { generateFullPrediction } from '../score-matrix';
 
 const LEAGUE_BASELINE = getDefaultLeagueBaseline();
@@ -174,6 +174,7 @@ describe('PHASE 15: Lambda V2 Compression Analysis', () => {
     
     // The TOP SCORE for these values:
     const pred = generateFullPrediction(v2.lambdaHome, v2.lambdaAway);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     console.log(`Top scores:`, pred.topExactScores.map((s: any) => `${s.score}=${(s.probability*100).toFixed(2)}%`));
     
     // If lambdas are both around 1.3-1.5 → 1-1 WILL be top score (that's math)

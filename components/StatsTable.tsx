@@ -1,6 +1,6 @@
 'use client';
 
-import { FixtureStatistic, Team } from '@/types/sportmonks';
+import { FixtureStatistic, Team } from '@/types/football';
 
 interface StatsTableProps {
   statistics: FixtureStatistic[];

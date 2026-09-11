@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
+import { getLeagues } from '@/lib/api-football';
 
 export const dynamic = 'force-dynamic';
-
-const SPORTMONKS_API_TOKEN = process.env.SPORTMONKS_API_TOKEN;
-const SPORTMONKS_BASE_URL = process.env.SPORTMONKS_BASE_URL || 'https://api.sportmonks.com/v3/football';
 
 /**
  * GET /api/leagues
@@ -11,24 +9,20 @@ const SPORTMONKS_BASE_URL = process.env.SPORTMONKS_BASE_URL || 'https://api.spor
  */
 export async function GET() {
   try {
-    const url = new URL(`${SPORTMONKS_BASE_URL}/leagues`);
-    url.searchParams.set('api_token', SPORTMONKS_API_TOKEN || '');
-    url.searchParams.set('include', 'currentSeason');
-    url.searchParams.set('per_page', '50');
+    const leagues = await getLeagues();
 
-    const response = await fetch(url.toString(), {
-      headers: { Accept: 'application/json' },
-    });
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`Sportmonks API error: ${response.status} - ${errorBody}`);
-    }
-
-    const data = await response.json();
+    // Map to normalized format for frontend compatibility
+    const mapped = leagues.map(l => ({
+      id: l.league.id,
+      name: l.league.name,
+      type: l.league.type,
+      image_path: l.league.logo,
+      country: l.country,
+      currentSeason: l.seasons.find(s => s.current) || null,
+    }));
 
     return NextResponse.json({
-      data: data.data || [],
+      data: mapped,
     });
   } catch (error) {
     console.error('[API/leagues] Error:', error);

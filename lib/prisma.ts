@@ -1,18 +1,33 @@
 import { PrismaClient } from './generated/prisma/client';
 
 function createPrismaClient(): PrismaClient | null {
-  // SQLite with better-sqlite3 only works in environments with a writable filesystem.
-  // On Vercel serverless, we skip DB initialization — prediction APIs return null gracefully.
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    console.warn('[Prisma] DATABASE_URL no está configurado.');
+    return null;
+  }
+
   try {
+    if (databaseUrl.startsWith('postgresql://') || databaseUrl.startsWith('postgres://')) {
+      /* eslint-disable @typescript-eslint/no-require-imports */
+      const { Pool } = require('pg');
+      const { PrismaPg } = require('@prisma/adapter-pg');
+      /* eslint-enable @typescript-eslint/no-require-imports */
+      const pool = new Pool({ connectionString: databaseUrl });
+      const adapter = new PrismaPg(pool);
+      return new PrismaClient({ adapter });
+    }
+
+    // Fallback to SQLite for legacy local development
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3');
     const path = require('path');
     /* eslint-enable @typescript-eslint/no-require-imports */
-    const dbPath = path.join(process.cwd(), 'prisma', 'dev.db');
+    const dbPath = path.join(process.cwd(), 'dev.db');
     const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` });
     return new PrismaClient({ adapter });
-  } catch {
-    console.warn('[Prisma] SQLite adapter not available — prediction storage disabled.');
+  } catch (error) {
+    console.warn('[Prisma] No se pudo inicializar el cliente:', error);
     return null;
   }
 }
