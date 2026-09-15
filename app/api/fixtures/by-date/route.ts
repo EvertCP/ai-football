@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getLeaguesByDate } from '@/lib/api-football';
+import { getLeaguesByDate, ApiRateLimitError } from '@/lib/api-football';
 import { NormalizedFixture } from '@/types/football';
 
 export const dynamic = 'force-dynamic';
@@ -75,6 +75,10 @@ export async function GET(request: NextRequest) {
       data: filteredLeagues,
     });
   } catch (error) {
+    if (error instanceof ApiRateLimitError) {
+      return NextResponse.json({ error: error.message }, { status: 429 });
+    }
+
     console.error('[API/fixtures/by-date] Error:', error);
     const message = error instanceof Error ? error.message : 'Error desconocido';
     return NextResponse.json(

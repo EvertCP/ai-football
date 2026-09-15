@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import MatchRow from '@/components/MatchRow';
 import DateCalendar from '@/components/DateCalendar';
+import PicksUpsell from '@/components/PicksUpsell';
 import { NormalizedFixture as Fixture } from '@/types/football';
 import { formatMatchTime, formatMatchDate, parseUTCDate, getLocalDateString } from '@/lib/formatDate';
 
@@ -15,6 +17,7 @@ interface LeagueWithFixtures {
 }
 
 export default function HomePage() {
+  const { data: session } = useSession();
   const [date, setDate] = useState(getLocalDateString());
   const [leagues, setLeagues] = useState<LeagueWithFixtures[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -343,6 +346,8 @@ export default function HomePage() {
             ))
           )}
         </div>
+
+        {session?.user?.role === 'USER' && <PicksUpsell />}
 
         {/* Quick Links */}
         <div className="bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-4">

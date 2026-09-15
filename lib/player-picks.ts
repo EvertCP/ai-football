@@ -1,84 +1,28 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// NOTE: This module is temporarily disabled during the API migration.
-// It will be re-implemented with API-Football player stats endpoints.
-import { LineupPlayer, MatchHistoryEntry, PlayerMatchStats, PlayerPick, PickItem } from '@/types/football';
+import {
+  FixturePlayerStats,
+  NormalizedFixture,
+  PlayerMatchStats,
+  PlayerPick,
+  PickItem,
+} from '@/types/football';
+import apiFootball from '@/lib/api-football';
 
-/**
- * Pick definitions: which stats to analyze and at what thresholds
- */
 const PICK_DEFINITIONS = [
   { stat: 'GOALS', label: 'Anotar gol', thresholds: [1] },
-  { stat: 'ASSISTS', label: 'Dar asistencia', thresholds: [1] },
   { stat: 'SHOTS_ON_TARGET', label: 'Tiro a puerta', thresholds: [1, 2] },
-  { stat: 'SHOTS_TOTAL', label: 'Tiros totales', thresholds: [1, 2, 3] },
-  { stat: 'KEY_PASSES', label: 'Pase clave', thresholds: [1, 2] },
-  { stat: 'TACKLES', label: 'Entrada exitosa', thresholds: [1, 2] },
-  { stat: 'FOULS', label: 'Falta cometida', thresholds: [1, 2] },
   { stat: 'YELLOWCARDS', label: 'Tarjeta amarilla', thresholds: [1] },
-  { stat: 'FOULS_DRAWN', label: 'Falta recibida', thresholds: [1, 2] },
-  { stat: 'TOTAL_CROSSES', label: 'Centros', thresholds: [1, 2] },
-  { stat: 'SUCCESSFUL_DRIBBLES', label: 'Regate exitoso', thresholds: [1] },
 ];
 
-/**
- * Extract a numeric stat value from a lineup player's details array
- */
-function getStatValue(player: LineupPlayer, statName: string): number {
-  if (!player.details || player.details.length === 0) return 0;
-  const detail = player.details.find(
-    d => d.type?.developer_name === statName
-  );
-  if (!detail) return 0;
-  const val = detail.data?.value;
-  if (typeof val === 'number') return val;
-  if (typeof val === 'string') return parseFloat(val) || 0;
-  if (typeof val === 'boolean') return val ? 1 : 0;
-  return 0;
+function getStatFromMatchStats(ms: PlayerMatchStats, stat: string): number {
+  switch (stat) {
+    case 'GOALS': return ms.goals;
+    case 'SHOTS_ON_TARGET': return ms.shotsOnTarget;
+    case 'YELLOWCARDS': return ms.yellowCards;
+    default: return 0;
+  }
 }
 
-/**
- * Extract per-match stats for a specific player from a fixture's lineups
- */
-export function extractPlayerStats(
-  fixture: any,
-  playerId: number
-): PlayerMatchStats | null {
-  if (!fixture.lineups) return null;
-
-  const playerLineup = (fixture.lineups as any[]).find(
-    (l: any) => l.player_id === playerId && l.details && l.details.length > 0
-  );
-  if (!playerLineup) return null;
-
-  const minutesPlayed = getStatValue(playerLineup, 'MINUTES_PLAYED');
-  // Skip if player didn't actually play (sub who wasn't used)
-  if (minutesPlayed === 0) return null;
-
-  return {
-    fixtureId: fixture.id,
-    fixtureName: fixture.name,
-    fixtureDate: fixture.starting_at,
-    playerId: playerLineup.player_id,
-    playerName: playerLineup.player_name,
-    teamId: playerLineup.team_id,
-    minutesPlayed,
-    goals: getStatValue(playerLineup, 'GOALS'),
-    assists: getStatValue(playerLineup, 'ASSISTS'),
-    shotsTotal: getStatValue(playerLineup, 'SHOTS_TOTAL'),
-    shotsOnTarget: getStatValue(playerLineup, 'SHOTS_ON_TARGET'),
-    keyPasses: getStatValue(playerLineup, 'KEY_PASSES'),
-    tackles: getStatValue(playerLineup, 'TACKLES'),
-    fouls: getStatValue(playerLineup, 'FOULS'),
-    yellowCards: getStatValue(playerLineup, 'YELLOWCARDS'),
-    rating: getStatValue(playerLineup, 'RATING'),
-  };
-}
-
-/**
- * Calculate picks for a player based on their recent match stats
- * Returns only picks with ≥60% hit rate
- */
-export function calculatePlayerPicks(
+function calculatePlayerPicks(
   matchStats: PlayerMatchStats[],
   playerInfo: {
     playerId: number;
@@ -92,14 +36,13 @@ export function calculatePlayerPicks(
     upcomingFixtureDate: string;
   }
 ): PlayerPick | null {
-  if (matchStats.length < 3) return null; // Need minimum 3 matches for meaningful picks
+  if (matchStats.length < 3) return null;
 
   const totalMatches = matchStats.length;
   const picks: PickItem[] = [];
 
   for (const def of PICK_DEFINITIONS) {
     for (const threshold of def.thresholds) {
-      // Count how many matches the player hit this threshold
       const hitCount = matchStats.filter(ms => {
         const value = getStatFromMatchStats(ms, def.stat);
         return value >= threshold;
@@ -107,12 +50,9 @@ export function calculatePlayerPicks(
 
       const percentage = Math.round((hitCount / totalMatches) * 100);
 
-      // Only include picks with ≥60% hit rate
       if (percentage >= 60) {
         const confidence: 'high' | 'medium' = percentage >= 80 ? 'high' : 'medium';
         const label = threshold > 1 ? `${def.label} (${threshold}+)` : def.label;
-
-        // Per-match values for bar chart (ordered oldest → newest)
         const matchValues = matchStats.map(ms => getStatFromMatchStats(ms, def.stat));
 
         picks.push({
@@ -131,7 +71,6 @@ export function calculatePlayerPicks(
 
   if (picks.length === 0) return null;
 
-  // Sort: high confidence first, then by percentage desc
   picks.sort((a, b) => {
     if (a.confidence !== b.confidence) {
       return a.confidence === 'high' ? -1 : 1;
@@ -139,19 +78,13 @@ export function calculatePlayerPicks(
     return b.percentage - a.percentage;
   });
 
-  // Build match history
-  const matchHistory: MatchHistoryEntry[] = matchStats.map(ms => ({
+  const matchHistory = matchStats.map(ms => ({
     fixtureId: ms.fixtureId,
     fixtureName: ms.fixtureName,
     fixtureDate: ms.fixtureDate,
     stats: {
       GOALS: ms.goals,
-      ASSISTS: ms.assists,
-      SHOTS_TOTAL: ms.shotsTotal,
       SHOTS_ON_TARGET: ms.shotsOnTarget,
-      KEY_PASSES: ms.keyPasses,
-      TACKLES: ms.tackles,
-      FOULS: ms.fouls,
       YELLOWCARDS: ms.yellowCards,
     },
   }));
@@ -163,34 +96,7 @@ export function calculatePlayerPicks(
   };
 }
 
-/**
- * Map stat developer_name to the corresponding field in PlayerMatchStats
- */
-function getStatFromMatchStats(ms: PlayerMatchStats, stat: string): number {
-  switch (stat) {
-    case 'GOALS': return ms.goals;
-    case 'ASSISTS': return ms.assists;
-    case 'SHOTS_TOTAL': return ms.shotsTotal;
-    case 'SHOTS_ON_TARGET': return ms.shotsOnTarget;
-    case 'KEY_PASSES': return ms.keyPasses;
-    case 'TACKLES': return ms.tackles;
-    case 'FOULS': return ms.fouls;
-    case 'YELLOWCARDS': return ms.yellowCards;
-    case 'FOULS_DRAWN': return ms.fouls; // approximation - TODO: add separate field
-    case 'TOTAL_CROSSES': return 0; // TODO: add to PlayerMatchStats
-    case 'SUCCESSFUL_DRIBBLES': return 0; // TODO: add to PlayerMatchStats
-    default: return 0;
-  }
-}
-
-/**
- * Rank all player picks and return top N
- */
-export function rankAndFilterPicks(
-  allPicks: PlayerPick[],
-  topN: number = 20
-): PlayerPick[] {
-  // Score each player's picks: sum of (percentage * confidence_weight)
+function rankAndFilterPicks(allPicks: PlayerPick[], topN: number = 20): PlayerPick[] {
   const scored = allPicks.map(pp => {
     const score = pp.picks.reduce((acc, pick) => {
       const weight = pick.confidence === 'high' ? 1.5 : 1;
@@ -199,7 +105,140 @@ export function rankAndFilterPicks(
     return { pick: pp, score };
   });
 
-  // Sort by score descending and take top N
   scored.sort((a, b) => b.score - a.score);
   return scored.slice(0, topN).map(s => s.pick);
+}
+
+function extractPlayerMatchStats(
+  fixture: NormalizedFixture,
+  fixturePlayerStats: FixturePlayerStats[],
+  playerIds: Set<number>
+): PlayerMatchStats[] {
+  const stats: PlayerMatchStats[] = [];
+
+  for (const teamStats of fixturePlayerStats) {
+    for (const p of teamStats.players) {
+      if (!playerIds.has(p.player.id)) continue;
+      const s = p.statistics[0];
+      if (!s) continue;
+
+      stats.push({
+        fixtureId: fixture.id,
+        fixtureName: fixture.name,
+        fixtureDate: fixture.starting_at,
+        playerId: p.player.id,
+        playerName: p.player.name,
+        teamId: teamStats.team.id,
+        minutesPlayed: s.games.minutes ?? 0,
+        goals: s.goals.total ?? 0,
+        assists: s.goals.assists ?? 0,
+        shotsTotal: s.shots.total ?? 0,
+        shotsOnTarget: s.shots.on ?? 0,
+        keyPasses: s.passes.key ?? 0,
+        tackles: s.tackles.total ?? 0,
+        fouls: s.fouls.committed ?? 0,
+        yellowCards: s.cards.yellow ?? 0,
+        rating: s.games.rating ? Number(s.games.rating) : 0,
+      });
+    }
+  }
+
+  return stats;
+}
+
+export async function getPlayerPicksForFixture(
+  fixtureId: number,
+  matchWindow: number = 5,
+  topN: number = 20
+): Promise<PlayerPick[]> {
+  const fixture = await apiFootball.getFixtureById(fixtureId);
+  if (!fixture) throw new Error('Partido no encontrado');
+  if (!fixture.lineups || fixture.lineups.length === 0) {
+    throw new Error('Alineaciones no disponibles para este partido');
+  }
+
+  const upcomingPlayers: { id: number; name: string; teamId: number }[] = [];
+  for (const lineup of fixture.lineups) {
+    for (const entry of lineup.startXI) {
+      upcomingPlayers.push({
+        id: entry.player.id,
+        name: entry.player.name,
+        teamId: lineup.team.id,
+      });
+    }
+  }
+
+  if (upcomingPlayers.length === 0) return [];
+
+  const playerIds = new Set(upcomingPlayers.map(p => p.id));
+  const teamNames = new Map<number, string>();
+  for (const p of fixture.participants || []) {
+    teamNames.set(p.id, p.name);
+  }
+
+  const matchStatsByPlayer = new Map<number, PlayerMatchStats[]>();
+
+  for (const player of upcomingPlayers) {
+    const teamId = player.teamId;
+    const history = await apiFootball.getTeamFixtures(teamId, matchWindow * 2);
+    const finished = history.filter(f => f.state?.short === 'FT').slice(0, matchWindow);
+
+    for (const f of finished) {
+      const playerStats = await apiFootball.getFixturePlayerStats(f.id);
+      const stats = extractPlayerMatchStats(f, playerStats, playerIds);
+      for (const s of stats) {
+        if (!matchStatsByPlayer.has(s.playerId)) {
+          matchStatsByPlayer.set(s.playerId, []);
+        }
+        matchStatsByPlayer.get(s.playerId)!.push(s);
+      }
+    }
+  }
+
+  const allPicks: PlayerPick[] = [];
+  for (const player of upcomingPlayers) {
+    const matchStats = matchStatsByPlayer.get(player.id) || [];
+    const pick = calculatePlayerPicks(matchStats, {
+      playerId: player.id,
+      playerName: player.name,
+      teamId: player.teamId,
+      teamName: teamNames.get(player.teamId) || '',
+      upcomingFixtureId: fixture.id,
+      upcomingFixtureName: fixture.name,
+      upcomingFixtureDate: fixture.starting_at,
+    });
+    if (pick) allPicks.push(pick);
+  }
+
+  return rankAndFilterPicks(allPicks, topN);
+}
+
+export async function getPlayerPicksForDate(
+  date: string,
+  matchWindow: number = 5,
+  topN: number = 20,
+  maxFixtures: number = 3
+): Promise<{ picks: PlayerPick[]; fixtureId?: number }> {
+  const fixtures = await apiFootball.getFixturesByDate(date);
+  const upcoming = fixtures
+    .filter(f => f.state?.short === 'NS')
+    .sort((a, b) => (a.starting_at_timestamp || 0) - (b.starting_at_timestamp || 0))
+    .slice(0, maxFixtures);
+
+  if (upcoming.length === 0) return { picks: [] };
+
+  const allPicks: PlayerPick[] = [];
+  for (const f of upcoming) {
+    try {
+      const picks = await getPlayerPicksForFixture(f.id, matchWindow, topN);
+      allPicks.push(...picks);
+    } catch {
+      // skip fixtures that fail
+    }
+  }
+
+  return {
+    picks: rankAndFilterPicks(allPicks, topN),
+    fixtureId: upcoming[0]?.id,
+  };
 }

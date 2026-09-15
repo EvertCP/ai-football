@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getLatestFixtures } from '@/lib/api-football';
+import { getLatestFixtures, ApiRateLimitError } from '@/lib/api-football';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +20,10 @@ export async function GET(request: NextRequest) {
       pagination: null,
     });
   } catch (error) {
+    if (error instanceof ApiRateLimitError) {
+      return NextResponse.json({ error: error.message }, { status: 429 });
+    }
+
     console.error('[API/fixtures/latest] Error:', error);
 
     const message = error instanceof Error ? error.message : 'Error desconocido';

@@ -21,14 +21,18 @@ export default function PlayerPicksPage() {
   const [error, setError] = useState<string | null>(null);
   const [meta, setMeta] = useState<Record<string, unknown> | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [matchWindow, setMatchWindow] = useState<10 | 5 | 20>(10);
+  const [matchWindow, setMatchWindow] = useState<10 | 5 | 20>(5);
+  const [fixtureId, setFixtureId] = useState('');
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
 
-  const fetchPicks = useCallback(async (date: string, matches: number) => {
+  const fetchPicks = useCallback(async (date: string, matches: number, id?: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/player-picks?date=${date}&limit=20&matches=${matches}`);
+      const url = id
+        ? `/api/player-picks?fixtureId=${encodeURIComponent(id)}&limit=20&matches=${matches}`
+        : `/api/player-picks?date=${date}&limit=20&matches=${matches}`;
+      const response = await fetch(url);
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.error || 'Error al obtener picks');
@@ -112,6 +116,30 @@ export default function PlayerPicksPage() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Fixture selector */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-[#1a1d2e] rounded-xl border border-gray-700/50 p-4">
+          <div className="flex-1 w-full sm:w-auto">
+            <label className="text-xs text-gray-400 block mb-1">ID del partido (opcional)</label>
+            <input
+              type="text"
+              value={fixtureId}
+              onChange={(e) => setFixtureId(e.target.value)}
+              placeholder="Ej: 1234567"
+              className="w-full px-3 py-2 bg-[#151823] border border-gray-700/50 rounded-lg text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+          </div>
+          <button
+            onClick={() => fetchPicks(selectedDate, matchWindow, fixtureId)}
+            disabled={!fixtureId || isLoading}
+            className="w-full sm:w-auto px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition-colors"
+          >
+            Cargar picks
+          </button>
+          <p className="text-xs text-gray-500 max-w-md">
+            Puedes encontrar el ID del partido en la URL de la página del partido: /match/<strong>id</strong>
+          </p>
         </div>
 
         {/* Loading */}

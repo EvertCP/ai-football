@@ -10,11 +10,9 @@ function createPrismaClient(): PrismaClient | null {
   try {
     if (databaseUrl.startsWith('postgresql://') || databaseUrl.startsWith('postgres://')) {
       /* eslint-disable @typescript-eslint/no-require-imports */
-      const { Pool } = require('pg');
       const { PrismaPg } = require('@prisma/adapter-pg');
       /* eslint-enable @typescript-eslint/no-require-imports */
-      const pool = new Pool({ connectionString: databaseUrl });
-      const adapter = new PrismaPg(pool);
+      const adapter = new PrismaPg(databaseUrl);
       return new PrismaClient({ adapter });
     }
 

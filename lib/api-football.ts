@@ -11,6 +11,7 @@
 import type {
   ApiFootballResponse,
   Fixture,
+  FixturePlayerStats,
   LeagueInfo,
   TeamInfo,
   StandingEntry,
@@ -20,6 +21,14 @@ import type {
   NormalizedScore,
   NormalizedStatistic,
 } from '@/types/football';
+
+export class ApiRateLimitError extends Error {
+  status = 429;
+  constructor(message = 'Límite de peticiones de API-Football alcanzado. Inténtalo más tarde o considera actualizar tu plan.') {
+    super(message);
+    this.name = 'ApiRateLimitError';
+  }
+}
 
 const API_FOOTBALL_KEY = process.env.API_FOOTBALL_KEY;
 const API_FOOTBALL_BASE_URL = process.env.API_FOOTBALL_BASE_URL || 'https://v3.football.api-sports.io';
@@ -113,7 +122,7 @@ async function apiFetch<T>(
         const errorBody = await response.text();
         const error = new Error(`API-Football error: ${response.status} ${response.statusText} - ${errorBody}`);
         if (response.status === 429) {
-          lastError = error;
+          lastError = new ApiRateLimitError();
           continue;
         }
         throw error;
@@ -129,7 +138,7 @@ async function apiFetch<T>(
 
         // Detect rate limit error and retry
         if (errMsg.toLowerCase().includes('too many requests') || errMsg.toLowerCase().includes('rate limit')) {
-          lastError = new Error(`API-Football API error: ${errMsg}`);
+          lastError = new ApiRateLimitError(`Límite de peticiones de API-Football alcanzado: ${errMsg}`);
           continue;
         }
 
@@ -546,6 +555,11 @@ export async function getFixtureStatistics(fixtureId: number): Promise<Normalize
   return stats;
 }
 
+export async function getFixturePlayerStats(fixtureId: number): Promise<FixturePlayerStats[]> {
+  const res = await apiFetch<FixturePlayerStats[]>('/fixtures/players', { fixture: fixtureId });
+  return res.response || [];
+}
+
 const apiFootball = {
   getFixturesByDate,
   getFixtureById,
@@ -562,6 +576,7 @@ const apiFootball = {
   getLeaguesByDate,
   getCurrentSeason,
   getFixtureStatistics,
+  getFixturePlayerStats,
   normalizeFixture,
 };
 
